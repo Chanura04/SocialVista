@@ -11,25 +11,25 @@ from celery import Celery
 
   # if inside a package
 
-consumer_key = os.getenv("TWITTER_API_KEY")
-consumer_secret = os.getenv("TWITTER_API_SECRET")
-access_token = os.getenv("TWITTER_ACCESS_TOKEN")
-access_token_secret = os.getenv("TWITTER_ACCESS_TOKEN_SECRET")
+# consumer_key = os.getenv("TWITTER_API_KEY")
+# consumer_secret = os.getenv("TWITTER_API_SECRET")
+# access_token = os.getenv("TWITTER_ACCESS_TOKEN")
+# access_token_secret = os.getenv("TWITTER_ACCESS_TOKEN_SECRET")
 app = Flask(__name__)
 app.secret_key="123"
 
 
 # Authenticate with the API
-auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
-auth.set_access_token(access_token, access_token_secret)
-api = tweepy.API(auth)
-
-try:
-    public_tweets = api.user_timeline(screen_name='@__Chanura__')
-    for tweet in public_tweets:
-        print("text is:",tweet.text)
-except tweepy.TweepyException as e:
-    print(f"Error: {e}")
+# auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+# auth.set_access_token(access_token, access_token_secret)
+# api = tweepy.API(auth)
+#
+# try:
+#     public_tweets = api.user_timeline(screen_name='@__Chanura__')
+#     for tweet in public_tweets:
+#         print("text is:",tweet.text)
+# except tweepy.TweepyException as e:
+#     print(f"Error: {e}")
 
 
 #configure sql alchemy
