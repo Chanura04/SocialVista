@@ -8,9 +8,9 @@ from flask import Flask,render_template,request,redirect,session,url_for
 from werkzeug.security import generate_password_hash,check_password_hash
 from flask_sqlalchemy import SQLAlchemy
 from celery import Celery
-from dotenv import load_dotenv
+
   # if inside a package
-load_dotenv()
+
 consumer_key = os.getenv("TWITTER_API_KEY")
 consumer_secret = os.getenv("TWITTER_API_SECRET")
 access_token = os.getenv("TWITTER_ACCESS_TOKEN")
