@@ -1,14 +1,22 @@
 {% extends 'base.html' %}
 
 {% block body %}
-<form method="POST" action="{{url_for('connect_twitter')}}">
-    <input type="text" name="screen_name" placeholder="Account Name">
-  <input type="text" name="api_key" placeholder="API Key">
-  <input type="text" name="api_secret" placeholder="API Secret">
-  <input type="text" name="access_token" placeholder="Access Token">
-  <input type="text" name="access_token_secret" placeholder="Access Token Secret">
+<!-- Connect Twitter Form -->
+<form method="POST" action="{{ url_for('connect_twitter') }}">
+  <input type="text" name="screen_name" placeholder="Account Name" required>
+  <input type="text" name="api_key" placeholder="API Key" required>
+  <input type="text" name="api_secret" placeholder="API Secret" required>
+  <input type="text" name="access_token" placeholder="Access Token" required>
+  <input type="text" name="access_token_secret" placeholder="Access Token Secret" required>
+  <button type="submit">Connect Twitter</button>
+</form>
 
-  <button type="submit"  onclick="window.location.href='{{ url_for('dashboard') }}'">Connect Twitter</button>
+<hr>
+
+<!-- Post Tweet Form -->
+<form method="POST" action="{{ url_for('post_tweet') }}">
+  <textarea name="tweet_content" placeholder="What's happening?" rows="4" cols="50" required></textarea>
+  <button type="submit">Post Tweet</button>
 </form>
 
 

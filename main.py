@@ -83,27 +83,89 @@ def dashboard():
 
         return render_template("get_api_details.html",  username=session['username'])
 
-def get_user_tweets():
-    """Fetch user tweets using Tweepy and user’s stored credentials"""
-    if  User.query.filter_by(email=session['email']).first():
-            user = User.query.filter_by(email=session['email']).first()
-            auth = tweepy.OAuthHandler(user.twitter_api_key, user.twitter_api_secret)
-            auth.set_access_token(user.twitter_access_token, user.twitter_access_token_secret)
-            api = tweepy.API(auth)
 
-            try:
-                # Fetch recent tweets (e.g., last 10 tweets from timeline)
-                tweets = api.user_timeline(
-                    screen_name=user.screen_name,  # Twitter username stored in DB
-                    count=10,
-                    tweet_mode="extended"  # ensures full text
-                )
-                return tweets
-            except Exception as e:
-                print("❌ Error fetching tweets:", e)
-                return []
-    else:
-        return None
+import tweepy
+from flask import request, redirect, url_for
+
+
+# ... (rest of your imports and code)
+
+@app.route("/post_tweet", methods=["POST"])
+def post_tweet():
+    """
+    Handles a form submission to post a new tweet.
+    """
+    tweet_text = request.form.get("tweet_content")
+    if not tweet_text:
+        # Handle case where tweet content is missing
+        return "Tweet content is required", 400
+
+    user = User.query.filter_by(email=session['email']).first()
+    if not user or not user.twitter_access_token:
+        # Redirect to the connect page if user is not authenticated
+        return redirect(url_for("connect_twitter"))
+
+    # Use the v2 client for posting tweets on the free tier
+    client = tweepy.Client(
+        consumer_key=user.twitter_api_key,
+        consumer_secret=user.twitter_api_secret,
+        access_token=user.twitter_access_token,
+        access_token_secret=user.twitter_access_token_secret
+    )
+
+    try:
+        response = client.create_tweet(text=tweet_text)
+        print("✅ Tweet posted successfully:", response.data)
+        # You could add a success flash message here
+    except Exception as e:
+        print("❌ Error posting tweet:", e)
+        # Add an error flash message here
+
+    return redirect(url_for("dashboard"))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# def get_user_tweets():
+#     """Fetch user tweets using Tweepy and user’s stored credentials"""
+#     if  User.query.filter_by(email=session['email']).first():
+#             user = User.query.filter_by(email=session['email']).first()
+#             auth = tweepy.OAuthHandler(user.twitter_api_key, user.twitter_api_secret)
+#             auth.set_access_token(user.twitter_access_token, user.twitter_access_token_secret)
+#             api = tweepy.API(auth)
+#
+#             try:
+#                 # Fetch recent tweets (e.g., last 10 tweets from timeline)
+#                 tweets = api.user_timeline(
+#                     screen_name=user.screen_name,  # Twitter username stored in DB
+#                     count=10,
+#                     tweet_mode="extended"  # ensures full text
+#                 )
+#                 return tweets
+#             except Exception as e:
+#                 print("❌ Error fetching tweets:", e)
+#                 return []
+#     else:
+#         return None
 
 #Login
 @app.route("/login",methods=["POST","GET"])
@@ -169,9 +231,9 @@ def connect_twitter():
     user.twitter_access_token_secret = request.form.get("access_token_secret")
     user.screen_name = request.form.get("screen_name")
     db.session.commit()
-    tweets = get_user_tweets()
+    # tweets = get_user_tweets()
     # return redirect(url_for("dashboard"))
-    return render_template("dashboard.html", tweet=tweets)
+    return render_template("dashboard.html" )
 
 
 
