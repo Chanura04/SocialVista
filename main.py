@@ -4,14 +4,20 @@
 from flask import Flask,render_template,request,redirect,session,url_for
 from werkzeug.security import generate_password_hash,check_password_hash
 from flask_sqlalchemy import SQLAlchemy
+from flask_session import Session
 app = Flask(__name__)
 app.secret_key="123"
+current_user = ""
 
 #configure sql alchemy
 app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///userData.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS']=False
 
 db = SQLAlchemy(app)
+
+
+
+
 
 #Database model => represent single raw
 class User(db.Model):
@@ -29,11 +35,14 @@ class User(db.Model):
         return check_password_hash(self.password,password)
 
 
-@app.route("/")
-def home():
-    if "username" in session:
-        return redirect(url_for("dashboard"))
-    return render_template("login.html")
+
+@app.route("/",methods=["GET","POST"])
+def dashboard():
+    if request.method=="POST":
+        return redirect(url_for("login"))
+    if request.method=="GET":
+        return render_template("dashboard.html", username=session['username'])
+
 
 
 #Login
@@ -46,16 +55,19 @@ def login():
         password = request.form.get("password")
         user = User.query.filter_by(email=email).first()
         if user:
+            session[email]=email
             if user.check_password(password):
-                currentUser = user.FirstName
-
-                session["username"] = currentUser
+                print(user.FirstName)
+                session['username'] = user.FirstName
                 return redirect(url_for("dashboard"))
+            else:
+                return render_template("login.html", error="Invalid Password...Please try again!",email=session[email])
+
         else:
             # otherwise show homepages
             return render_template("login.html")
     if request.method == "GET":
-        return render_template("login.html")
+        return render_template("login.html",error="")
 
 
 #register
@@ -112,6 +124,9 @@ def signup():
 
 
 #dashboard
+# @app.route("/dashboard")
+# def dashboard():
+#     return render_template("dashboard.html",username=session["username"])
 
 
 
@@ -123,7 +138,11 @@ def signup():
 
 
 #logout
-
+@app.route("/logout")
+def logout():
+    session.pop("username",None)
+    session.pop("email",None)
+    return redirect(url_for("login"))
 
 
 
