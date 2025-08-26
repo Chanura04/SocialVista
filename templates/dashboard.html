@@ -5,6 +5,31 @@
 <div class="container">
     <h1>Welcome , {{username}}</h1>
     <p>You are logged in</p>
+    <ul>
+      {% for tweet in tweets %}
+        <li>{{ tweet.text }}</li>
+      {% endfor %}
+    </ul>
+
+    <h1>-----</h1>
+    <li>
+        {% for tweet in tweets %}
+            <strong>{{ tweet.user.screen_name }}</strong>: {{ tweet.text }}
+            <br><small>{{ tweet.created_at }}</small>
+        {% endfor %}
+    </li>
+
+     <h1>-----</h1>
+    <ul>
+        {% for t in tweets %}
+            <li>{{ t.full_text }}</li>
+        {% else %}
+            <li>No tweets available</li>
+        {% endfor %}
+    </ul>
+
+
+
     <a href="/login" class="btn btn-logout">Logout</a>
 </div>
 
