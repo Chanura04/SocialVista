@@ -3,33 +3,20 @@
 #generate_password_hash,check_password_hash password encrypting and decrypting
 import os
 
-import tweepy
+
 from flask import Flask,render_template,request,redirect,session,url_for
 from werkzeug.security import generate_password_hash,check_password_hash
 from flask_sqlalchemy import SQLAlchemy
 from celery import Celery
+import tweepy
 
   # if inside a package
 
-# consumer_key = os.getenv("TWITTER_API_KEY")
-# consumer_secret = os.getenv("TWITTER_API_SECRET")
-# access_token = os.getenv("TWITTER_ACCESS_TOKEN")
-# access_token_secret = os.getenv("TWITTER_ACCESS_TOKEN_SECRET")
 app = Flask(__name__)
 app.secret_key="123"
 
 
-# Authenticate with the API
-# auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
-# auth.set_access_token(access_token, access_token_secret)
-# api = tweepy.API(auth)
-#
-# try:
-#     public_tweets = api.user_timeline(screen_name='@__Chanura__')
-#     for tweet in public_tweets:
-#         print("text is:",tweet.text)
-# except tweepy.TweepyException as e:
-#     print(f"Error: {e}")
+
 
 
 #configure sql alchemy
@@ -38,16 +25,6 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS']=False
 
 db = SQLAlchemy(app)
 
-celery = Celery(
-    __name__,
-    broker="redis://127.0.0.1:6379/0",
-    backend="redis://127.0.0.1:6379/0"
-)
-@celery.task
-def divide(x, y):
-    import time
-    time.sleep(5)
-    return x / y
 
 
 #Database model => represent single raw
@@ -76,16 +53,17 @@ class User(db.Model):
 @app.route("/",methods=["GET","POST"])
 def dashboard():
     if request.method=="POST":
-        return redirect(url_for("login"))
+        # redirect(url_for("connect_twitter"))
+
+
+        return render_template("get_api_details.html",  username=session.get('username'))
+
     if request.method=="GET":
-        redirect(url_for("connect_twitter"))
+        return redirect(url_for("login"))
 
 
-        return render_template("get_api_details.html",  username=session['username'])
 
 
-import tweepy
-from flask import request, redirect, url_for
 
 
 # ... (rest of your imports and code)
