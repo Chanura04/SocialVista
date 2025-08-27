@@ -50,6 +50,10 @@ class User(db.Model):
     client_secret=db.Column(db.String(100))
     isFilledApiDetails=db.Column(db.Boolean,default=False)
     canPost=db.Column(db.Boolean,default=False)
+    signupStatus=db.Column(db.Boolean, default=False)
+    accountCreatedOn = db.Column(db.DateTime, default=db.func.current_timestamp())
+    accountUpdatedOn = db.Column(db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
+    accountStatus = db.Column(db.Boolean, default=False)
 
     def set_password(self,password):
         self.password = generate_password_hash(password)
@@ -124,24 +128,27 @@ def signup():
     if request.method == "POST":
         email = request.form["email"]
         if email:
-            new_user =User.query.filter_by(email=email).first()
-            if new_user:
-                return render_template("login.html",error="username already exists here!")
+            try:
+                new_user =User.query.filter_by(email=email).first()
+                if new_user:
+                    return render_template("login.html",error="username already exists here!")
 
-            else:
+                else:
 
-                first_name = request.form.get("first_name")
-                last_name = request.form.get("last_name")
-                email = request.form.get("email")
-                password = request.form.get("password")
-                print("📌 DEBUG Signup values:", first_name, last_name, email, password)
+                    first_name = request.form.get("first_name")
+                    last_name = request.form.get("last_name")
+                    email = request.form.get("email")
+                    password = request.form.get("password")
+                    print("📌 DEBUG Signup values:", first_name, last_name, email, password)
 
-                new_user = User(FirstName=first_name,LastName=last_name,email=email)
-                new_user.set_password(password)
-                db.session.add(new_user)
-                db.session.commit()
-                session["username"] = first_name
-                return redirect(url_for("login"))
+                    new_user = User(FirstName=first_name,LastName=last_name,email=email,signupStatus=True,accountStatus=True,accountCreatedOn=db.func.current_timestamp())
+                    new_user.set_password(password)
+                    db.session.add(new_user)
+                    db.session.commit()
+                    session["username"] = first_name
+                    return redirect(url_for("login"))
+            except Exception as e:
+                print(e)
     if request.method == "GET":
         return render_template("signup.html")
 
@@ -163,7 +170,10 @@ def check_api_details():
         client_secret = user.client_secret
         user_access_token = user.twitter_access_token
         user_access_token_secret = user.twitter_access_token_secret
-        if not client_id or not client_secret or not user_access_token or not user_access_token_secret:
+        twit_api_key = user.twitter_api_key
+        twit_api_secret = user.twitter_api_secret
+        if not client_id or not client_secret or not user_access_token or not user_access_token_secret or not twit_api_key or not twit_api_secret:
+            print("api details not filled...redirecting to get api details page...!")
             return False
         else:
             return True
@@ -254,6 +264,7 @@ def connect_twitter():
 
         else:
             return redirect(url_for("login"))
+    return redirect(url_for("get_api_details"))
 
 @app.route("/get_api_details")
 def get_api_details():
