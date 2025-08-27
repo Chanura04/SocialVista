@@ -5,29 +5,50 @@
 <div class="container">
     <h1>Welcome , {{username}}</h1>
     <p>You are logged in</p>
-    <ul>
-      {% for tweet in tweets %}
-        <li>{{ tweet.text }}</li>
-      {% endfor %}
-    </ul>
+<!--    <ul>-->
+<!--      {% for tweet in tweets %}-->
+<!--        <li>{{ tweet.text }}</li>-->
+<!--      {% endfor %}-->
+<!--    </ul>-->
 
-    <h1>-----</h1>
-    <li>
-        {% for tweet in tweets %}
-            <strong>{{ tweet.user.screen_name }}</strong>: {{ tweet.text }}
-            <br><small>{{ tweet.created_at }}</small>
-        {% endfor %}
-    </li>
+<!--    <h1>-&#45;&#45;&#45;&#45;</h1>-->
+<!--    <li>-->
+<!--        {% for tweet in tweets %}-->
+<!--            <strong>{{ tweet.user.screen_name }}</strong>: {{ tweet.text }}-->
+<!--            <br><small>{{ tweet.created_at }}</small>-->
+<!--        {% endfor %}-->
+<!--    </li>-->
 
-     <h1>-----</h1>
-    <ul>
-        {% for t in tweets %}
-            <li>{{ t.full_text }}</li>
-        {% else %}
-            <li>No tweets available</li>
-        {% endfor %}
-    </ul>
+<!--     <h1>-&#45;&#45;&#45;&#45;</h1>-->
+<!--    <ul>-->
+<!--        {% for t in tweets %}-->
+<!--            <li>{{ t.full_text }}</li>-->
+<!--        {% else %}-->
+<!--            <li>No tweets available</li>-->
+<!--        {% endfor %}-->
+<!--    </ul>-->
+    <form action="{{url_for('connect_twitter')}}" method="GET" id="auth-form_1">
+<!--            <button class="btn btn-login" onclick="window.location.href='{{ url_for('get_api_details') }}'" >Connect Twitter</button>-->
+            <button class="btn btn-login"  >Connect Twitter</button>
 
+    </form><br><br>
+   <form action="{{url_for('post_tweet')}}" method="GET" id="auth-form_2">
+<!--           <button class="btn btn-post_tweet" onclick="window.location.href='{{ url_for('post_tweet') }}'">Post Tweet</button>-->
+              <button class="btn btn-post_tweet">Post Tweet</button>
+
+   </form><br><br>
+
+    <form action="{{url_for('login')}}" method="GET" id="auth-form_3">
+<!--           <button class="btn btn-post_tweet" onclick="window.location.href='{{ url_for('post_tweet') }}'">Post Tweet</button>-->
+              <button class="btn btn-post_tweet">Login</button>
+
+   </form><br><br>
+
+    <form action="{{url_for('signup')}}" method="GET" id="auth-form_4">
+<!--           <button class="btn btn-post_tweet" onclick="window.location.href='{{ url_for('post_tweet') }}'">Post Tweet</button>-->
+              <button class="btn btn-post_tweet">SignUp</button>
+
+   </form><br><br>
 
 
     <a href="/login" class="btn btn-logout">Logout</a>
