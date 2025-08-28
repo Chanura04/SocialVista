@@ -2,15 +2,14 @@
 #redirect for different pages
 #generate_password_hash,check_password_hash password encrypting and decrypting
 import os,glob
-
-
+from datetime import datetime
+import pytz
 from flask import Flask,render_template,request,redirect,session,url_for,flash
 from werkzeug.security import generate_password_hash,check_password_hash
 from flask_sqlalchemy import SQLAlchemy
-from celery import Celery
 import tweepy
 
-  # if inside a package
+
 
 app = Flask(__name__)
 app.secret_key="123"
@@ -34,6 +33,8 @@ db = SQLAlchemy(app)
 
 #Database model => represent single raw
 class User(db.Model):
+
+
     #class variables
     id = db.Column(db.Integer,primary_key=True)
     FirstName = db.Column(db.String(20),nullable=False)
@@ -51,8 +52,12 @@ class User(db.Model):
     isFilledApiDetails=db.Column(db.Boolean,default=False)
     canPost=db.Column(db.Boolean,default=False)
     signupStatus=db.Column(db.Boolean, default=False)
-    accountCreatedOn = db.Column(db.DateTime, default=db.func.current_timestamp())
-    accountUpdatedOn = db.Column(db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
+
+
+
+    accountCreatedOn = db.Column(db.DateTime, default=lambda: datetime.now(pytz.timezone("Asia/Colombo")),onupdate=lambda: datetime.now(pytz.timezone("Asia/Colombo")))
+
+    accountUpdatedOn = db.Column(db.DateTime, default=lambda: datetime.now(pytz.timezone("Asia/Colombo")),onupdate=lambda: datetime.now(pytz.timezone("Asia/Colombo")))
     accountStatus = db.Column(db.Boolean, default=False)
 
     def set_password(self,password):
@@ -72,29 +77,6 @@ def dashboard():
 
 
 
-
-# def get_user_tweets():
-#     """Fetch user tweets using Tweepy and user’s stored credentials"""
-#     if  User.query.filter_by(email=session['email']).first():
-#             user = User.query.filter_by(email=session['email']).first()
-#             auth = tweepy.OAuthHandler(user.twitter_api_key, user.twitter_api_secret)
-#             auth.set_access_token(user.twitter_access_token, user.twitter_access_token_secret)
-#             api = tweepy.API(auth)
-#
-#             try:
-#                 # Fetch recent tweets (e.g., last 10 tweets from timeline)
-#                 tweets = api.user_timeline(
-#                     screen_name=user.screen_name,  # Twitter username stored in DB
-#                     count=10,
-#                     tweet_mode="extended"  # ensures full text
-#                 )
-#                 return tweets
-#             except Exception as e:
-#                 print("❌ Error fetching tweets:", e)
-#                 return []
-#     else:
-#         return None
-
 #Login
 @app.route("/login",methods=["POST","GET"])
 def login():
@@ -111,6 +93,8 @@ def login():
                 print(user.FirstName)
                 session['username'] = user.FirstName
                 session['toDashboard'] = True
+                user.accountUpdatedOn = datetime.now(pytz.timezone("Asia/Colombo"))
+                db.session.commit()
                 return redirect(url_for("dashboard"))
             else:
                 return render_template("login.html", error="Invalid Password...Please try again!",email=session[email])
@@ -152,16 +136,6 @@ def signup():
     if request.method == "GET":
         return render_template("signup.html")
 
-# @app.route("/get_api_details" )
-# def get_api_details():
-#
-#         return render_template("get_api_details.html")
-
-# client = tweepy.Client()
-                    # client_id = request.args.get("client_id")
-                    # client_secret = request.args.get("client_secret")
-                    # user_access_token = request.args.get("user_access_token")
-                    # user_access_token_secret = request.args.get("user_access_token_secret")
 
 def check_api_details():
     user = User.query.filter_by(email=session['email']).first()
@@ -179,46 +153,48 @@ def check_api_details():
             return True
     return False
 
-@app.route("/post_tweet",methods=["POST","GET"])
+@app.route("/post_tweet", methods=["POST", "GET"])
 def post_tweet():
     if request.method == "POST":
         if check_api_details():
             user = User.query.filter_by(email=session['email']).first()
 
-            if user.canPost:
-                user = User.query.filter_by(email=session['email']).first()
-                if user:
-                    client_id = user.client_id
-                    client_secret = user.client_secret
-                    user_access_token = user.twitter_access_token
-                    user_access_token_secret = user.twitter_access_token_secret
-                    if not client_id or not client_secret or not user_access_token or not user_access_token_secret:
+            if user and user.canPost:
+                twitter_api_key = user.twitter_api_key
+                twitter_api_secret = user.twitter_api_secret
+                user_access_token = user.twitter_access_token
+                user_access_token_secret = user.twitter_access_token_secret
 
-                        client = tweepy.Client(
-                            consumer_key=client_id,
-                            consumer_secret=client_secret,
-                            access_token=user_access_token,
-                            access_token_secret=user_access_token_secret
-                        )
-                        texts = request.form.get("tweet_content")
-                        # Post a tweet
-                        try:
-                            response = client.create_tweet(text=texts)
-                            flash("🎉 Tweet posted successfully!")
-                            print(response)
-                        except Exception as e:
-                            flash("Error posting tweet!!!. Invalid API details...")
-                            print(f"Error posting tweet: {e}")
-                    else:
-                        flash("Please fill the api details!")
+                if twitter_api_key and twitter_api_secret and user_access_token and user_access_token_secret:
+                    client = tweepy.Client(
+                        consumer_key=twitter_api_key,
+                        consumer_secret=twitter_api_secret,
+                        access_token=user_access_token,
+                        access_token_secret=user_access_token_secret
+                    )
+                    texts = request.form.get("tweet_content")
+
+                    try:
+                        response = client.create_tweet(text=texts)
+                        flash("🎉 Tweet posted successfully!")
+                        print(response)
+                        user.accountUpdatedOn = datetime.now(pytz.timezone("Asia/Colombo"))
+                        db.session.commit()
+                    except Exception as e:
+                        flash("Error posting tweet! Invalid API details...")
+                        print(f"Error posting tweet: {e}")
                 else:
-                    flash("Please login first!")
+                    flash("⚠️ Please fill in the API details first!")
+            else:
+                flash("⚠️ Please login or check your permissions first!")
         else:
             return redirect(url_for("connect_twitter"))
 
-    if request.method == "GET":
-        return render_template("post_content.html")
+        # After POST (success or fail), always return something
+        return redirect(url_for("post_tweet"))
 
+    # GET request
+    return render_template("post_content.html")
 
 
 
