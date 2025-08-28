@@ -32,6 +32,12 @@
             <button class="btn btn-login"  >Connect Twitter</button>
 
     </form><br><br>
+
+    <form action="{{url_for('show_api_credentials')}}" method="GET" id="auth-form_1">
+
+            <button class="btn btn-login"  >Show Api Details</button>
+
+    </form><br><br>
    <form action="{{url_for('post_tweet')}}" method="GET" id="auth-form_2">
 <!--           <button class="btn btn-post_tweet" onclick="window.location.href='{{ url_for('post_tweet') }}'">Post Tweet</button>-->
               <button class="btn btn-post_tweet">Post Tweet</button>

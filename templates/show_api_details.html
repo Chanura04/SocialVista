@@ -1,15 +1,18 @@
 {% extends 'base.html' %}
 
 {% block body %}
-    <h3>Twitter API Details</h3><br>
-    <p>Twitter API Key: {{ twitter_api_key }}</p><br>
-    <p>Twitter API Secret: {{ twitter_api_secret }}</p><br>
-    <p>Twitter Access Token: {{ user_access_token }}</p><br>
-    <p>Twitter Access Token Secret: {{ user_access_token_secret }}</p><br>
-    <p>Twitter Client ID: {{ client_id }}</p><br>
-    <p>Twitter Client Secret: {{ client_secret }}</p><br>
 
-    <form method="GET" action="{{ url_for('connect_twitter') }}">
+        <h3>Twitter API Details</h3><br>
+        <p>Screen Name: {{ screen_name }}</p>
+        <p>Twitter API Key: {{ twitter_api_key }}</p><br>
+        <p>Twitter API Secret: {{ twitter_api_secret }}</p><br>
+        <p>Twitter Access Token: {{ user_access_token }}</p><br>
+        <p>Twitter Access Token Secret: {{ user_access_token_secret }}</p><br>
+        <p>Twitter Client ID: {{ client_id }}</p><br>
+        <p>Twitter Client Secret: {{ client_secret }}</p><br>
+
+
+    <form method="POST" action="{{ url_for('reset_api_details') }}">
             <button >Reset Data</button>
 
     </form>
