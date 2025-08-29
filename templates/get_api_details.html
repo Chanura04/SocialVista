@@ -1,8 +1,9 @@
 {% extends 'base.html' %}
 
 {% block body %}
+
 <!-- Connect Twitter Form -->
-<form method="POST" action="{{ url_for('connect_twitter') }}">
+<form method="POST" action="{{ url_for('api_details.connect_twitter') }}">
   <input type="text" name="screen_name" placeholder="Account Name" required>
   <input type="text" name="api_key" placeholder="API Key" required>
   <input type="text" name="api_secret" placeholder="API Secret" required>

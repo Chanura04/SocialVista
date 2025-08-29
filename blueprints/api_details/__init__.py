@@ -1,0 +1,1 @@
+from .routes import api_details_bp

@@ -1,14 +1,13 @@
 {% extends 'base.html' %}
 
 {% block body %}
-
 <div class="container">
     <h1>Login</h1>
-    <form action="{{url_for('login')}}" method="POST" id="auth-form">
+    <form action="{{url_for('auth.login')}}" method="POST" id="auth-form">
         <input type="email" placeholder="email" value="{{email}}" name="email" class="input-field">
         <input type="password" placeholder="password" name="password" class="input-field">
         <input type="submit" value="Login" class="btn btn-login">
-        <input type="button" value="Register" class="btn btn-login" onclick="window.location.href='{{ url_for('signup') }}'">
+        <input type="button" value="Register" class="btn btn-login" onclick="window.location.href='{{ url_for('auth.signup') }}'">
 
     </form>
         <h4>{{error}}</h4>
