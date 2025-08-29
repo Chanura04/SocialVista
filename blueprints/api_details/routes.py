@@ -3,7 +3,7 @@
 from flask import Blueprint, render_template, request, session, redirect, url_for, flash
 from database import get_pg_connection, check_user_exists
 from helpers import get_current_user_fernet_key, APIKeyHandler
-
+from decorators import has_role # Adjust the path if you placed it elsewhere
 api_details_bp = Blueprint('api_details', __name__)
 
 
@@ -100,6 +100,7 @@ def connect_twitter():
 
 
 @api_details_bp.route("/reset_api_details", methods=["POST"])
+@has_role('admin')
 def reset_api_details():
     if request.method == "POST":
         if check_user_exists(session['email']):
@@ -142,7 +143,7 @@ def reset_api_details():
             return redirect(url_for("api_details.show_api_credentials"))
         else:
             return redirect(url_for("auth.login"))
-    return redirect(url_for("show_api_credentials"))
+    return redirect(url_for("api_details.show_api_credentials"))
 
 
 

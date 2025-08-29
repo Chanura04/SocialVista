@@ -33,14 +33,12 @@
     </form><br><br>
 
     <form action="{{url_for('api_details.show_api_credentials')}}" method="GET" id="auth-form_1">
-
             <button class="btn btn-login"  >Show Api Details</button>
-
     </form><br><br>
+
    <form action="{{url_for('x_platform.post_tweet')}}" method="GET" id="auth-form_2">
 <!--           <button class="btn btn-post_tweet" onclick="window.location.href='{{ url_for('x_platform.post_tweet') }}'">Post Tweet</button>-->
               <button class="btn btn-post_tweet">Post Tweet</button>
-
    </form><br><br>
 
     <form action="{{url_for('auth.login')}}" method="GET" id="auth-form_3">
@@ -52,11 +50,11 @@
     <form action="{{url_for('auth.signup')}}" method="GET" id="auth-form_4">
 <!--           <button class="btn btn-post_tweet" onclick="window.location.href='{{ url_for('x_platform.post_tweet') }}'">Post Tweet</button>-->
               <button class="btn btn-post_tweet">SignUp</button>
-
    </form><br><br>
 
-
+{% if role == 'admin' %}
     <a href="/login" class="btn btn-logout">Logout</a>
+{% endif %}
 </div>
 
 

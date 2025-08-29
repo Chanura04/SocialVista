@@ -167,13 +167,13 @@ def login():
                 update_accountUpdatedOn_column(session['email'])
                 return redirect(url_for("dashboard"))
             else:
-                return render_template("login.html", error="Invalid Password...Please try again!",email=session['email'])
+                return render_template("login.html", error="Invalid Password...Please try again!", email=session['email'])
 
         else:
             # otherwise show homepages
-            return render_template("login.html",error="User does not exist...Please signup first!")
+            return render_template("login.html", error="User does not exist...Please signup first!")
     if request.method == "GET":
-        return render_template("login.html",error="")
+        return render_template("login.html", error="")
 
 
 #register
@@ -186,7 +186,7 @@ def signup():
             try:
 
                 if exists:
-                    return render_template("login.html",error="username already exists here!")
+                    return render_template("login.html", error="username already exists here!")
 
                 else:
 
@@ -401,7 +401,7 @@ def connect_twitter():
 
                 # tweets = get_user_tweets()
                 # return redirect(url_for("dashboard"))
-                return render_template("dashboard.html" )
+                return render_template("dashboard.html")
             else:
                 session['canPost'] = False
                 return redirect(url_for("dashboard"))

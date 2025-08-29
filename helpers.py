@@ -32,18 +32,18 @@ def get_current_user_fernet_key():
     conn.close()
     return result[0] if result else None
 
-def check_canPost():
-    conn = get_pg_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT canPost FROM UserData WHERE Email = %s", (session['email'],))
-    result = cursor.fetchone()
-    conn.close()
-    return result[0] is not None
-
-def check_api_details():
-    conn = get_pg_connection()
-    cursor = conn.cursor()
-    cursor.execute("SELECT twitter_api_key,twitter_api_secret FROM UserData WHERE Email = %s", (session['email'],))
-    result = cursor.fetchone()
-    conn.close()
-    return result[0] is not None and result[1] is not None
+# def check_canPost():
+#     conn = get_pg_connection()
+#     cursor = conn.cursor()
+#     cursor.execute("SELECT canPost FROM UserData WHERE Email = %s", (session['email'],))
+#     result = cursor.fetchone()
+#     conn.close()
+#     return result[0] is not None
+#
+# def check_api_details():
+#     conn = get_pg_connection()
+#     cursor = conn.cursor()
+#     cursor.execute("SELECT twitter_api_key,twitter_api_secret FROM UserData WHERE Email = %s", (session['email'],))
+#     result = cursor.fetchone()
+#     conn.close()
+#     return result[0] is not None and result[1] is not None

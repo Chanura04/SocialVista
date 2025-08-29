@@ -4,18 +4,18 @@ from flask import Blueprint, render_template, request, redirect, url_for, sessio
 from werkzeug.security import generate_password_hash, check_password_hash
 # Import your database and helper functions from a common module
 from database import get_pg_connection, get_user_password, get_user_first_name, check_user_exists, \
-    update_accountUpdatedOn_column, update_accountCreatedOn_column
+    update_accountUpdatedOn_column, update_accountCreatedOn_column,get_user_role
 from helpers import Password
 from cryptography.fernet import Fernet
 auth_bp = Blueprint('auth', __name__, template_folder='templates', static_folder='static')
 
-class Password:
-    def set_password(self,password):
-        self.password = generate_password_hash(password)
-        return self.password
-
-    def check_password(self,hashed_password, plain_password):
-        return check_password_hash(hashed_password, plain_password)
+# class Password:
+#     def set_password(self,password):
+#         self.password = generate_password_hash(password)
+#         return self.password
+#
+#     def check_password(self,hashed_password, plain_password):
+#         return check_password_hash(hashed_password, plain_password)
 
 @auth_bp.route("/login", methods=["POST", "GET"])
 def login():
@@ -24,6 +24,8 @@ def login():
     if request.method == "POST":
         email = request.form.get("email")
         session['email']=email
+        user_role = get_user_role(session['email'])
+        session['role'] = user_role
         password = request.form.get("password")
 
         exists = check_user_exists(email)

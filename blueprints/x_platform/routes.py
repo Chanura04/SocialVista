@@ -1,5 +1,6 @@
 # blueprints/twitter/routes.py
-
+from requests_oauthlib import OAuth1Session
+import json
 import tweepy
 from flask import Blueprint, request, session, flash, redirect, url_for, render_template
 # Import your database and helper functions
@@ -49,18 +50,39 @@ def post_tweet():
                         decrypt twitter user access token secret: {decrypt_twitter_user_access_token_secret}""")
 
                     if twitter_api_key and twitter_api_secret and twitter_user_access_token and twitter_user_access_token_secret:
-                        client = tweepy.Client(
-                            consumer_key=decrypt_twitter_api_key,
-                            consumer_secret=decrypt_twitter_api_secret,
-                            access_token=decrypt_twitter_user_access_token,
-                            access_token_secret=decrypt_twitter_user_access_token_secret
-                        )
-                        texts = request.form.get("tweet_content")
+                        # client = tweepy.Client(
+                        #     consumer_key=decrypt_twitter_api_key,
+                        #     consumer_secret=decrypt_twitter_api_secret,
+                        #     access_token=decrypt_twitter_user_access_token,
+                        #     access_token_secret=decrypt_twitter_user_access_token_secret
+                        # )
 
+                        # Create an OAuth1Session object for authentication
+                        oauth = OAuth1Session(
+                            decrypt_twitter_api_key,
+                            client_secret=decrypt_twitter_api_secret,
+                            resource_owner_key=decrypt_twitter_user_access_token,
+                            resource_owner_secret=decrypt_twitter_user_access_token_secret,
+                        )
+
+                        texts = request.form.get("tweet_content")
+                        # The X API endpoint for creating a tweet
+                        url = "https://api.x.com/2/tweets"
+
+                        # The JSON payload for the tweet with reply settings
+                        # Options for 'reply_settings' are: 'mentionedUsers', 'following', 'everyone', 'verified'
+                        payload = {
+                            "text": texts,
+                            "reply_settings": "following"
+                        }
                         try:
-                            response = client.create_tweet(text=texts)
-                            flash("🎉 Tweet posted successfully!")
-                            print(response)
+                            response = oauth.post(url, json=payload)
+                            response.raise_for_status()  # Raises an HTTPError for bad responses
+
+                            # Print the API response
+                            print("Response status code:", response.status_code)
+                            json_response = response.json()
+                            print(json.dumps(json_response, indent=4))
                             update_accountUpdatedOn_column(session['email'])
 
                         except Exception as e:

@@ -108,13 +108,13 @@ def login():
                 db.session.commit()
                 return redirect(url_for("dashboard"))
             else:
-                return render_template("login.html", error="Invalid Password...Please try again!",email=session[email])
+                return render_template("login.html", error="Invalid Password...Please try again!", email=session[email])
 
         else:
             # otherwise show homepages
-            return render_template("login.html",error="User does not exist...Please signup first!")
+            return render_template("login.html", error="User does not exist...Please signup first!")
     if request.method == "GET":
-        return render_template("login.html",error="")
+        return render_template("login.html", error="")
 
 
 #register
@@ -126,7 +126,7 @@ def signup():
             try:
                 new_user =User.query.filter_by(email=email).first()
                 if new_user:
-                    return render_template("login.html",error="username already exists here!")
+                    return render_template("login.html", error="username already exists here!")
 
                 else:
 
@@ -227,7 +227,7 @@ def connect_twitter():
 
             # tweets = get_user_tweets()
             # return redirect(url_for("dashboard"))
-            return render_template("dashboard.html" )
+            return render_template("dashboard.html")
         else:
             session['canPost'] = False
             return redirect(url_for("dashboard"))
@@ -270,7 +270,7 @@ def show_api_credentials():
             twitter_api_key = user.twitter_api_key
             twitter_api_secret = user.twitter_api_secret
             if not client_id or not client_secret or not user_access_token or not user_access_token_secret or not twitter_api_key or not twitter_api_secret:
-                 return render_template("show_api_details.html",client_id=client_id,client_secret=client_secret,user_access_token=user_access_token,user_access_token_secret=user_access_token_secret,twitter_api_key=twitter_api_key,twitter_api_secret=twitter_api_secret)
+                 return render_template("show_api_details.html", client_id=client_id, client_secret=client_secret, user_access_token=user_access_token, user_access_token_secret=user_access_token_secret, twitter_api_key=twitter_api_key, twitter_api_secret=twitter_api_secret)
             else:
                 flash("Please fill the API details!")
         else:

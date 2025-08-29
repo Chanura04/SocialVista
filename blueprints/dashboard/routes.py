@@ -11,6 +11,7 @@ def dashboard():
         session["reset_token"] = current_app.config["SESSION_RESET_TOKEN"]
 
     if session.get("username") and session.get("toDashboard"):
-        return render_template("dashboard.html", username=session.get('username'))
+        user_role = session.get('role', 'user')
+        return render_template("dashboard.html", username=session.get('username'), role=user_role)
     else:
         return render_template("dashboard.html")

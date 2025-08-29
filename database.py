@@ -92,4 +92,10 @@ def check_canPost():
     cursor.execute("SELECT canPost FROM UserData WHERE Email = %s", (session['email'],))
     result = cursor.fetchone()
     return result[0] is not None
-# All other database functions like `check_user_exists`, `update_accountUpdatedOn_column`, etc. go here.
+
+def get_user_role(email):
+    UserData_conn = get_pg_connection()
+    cursor = UserData_conn.cursor()
+    cursor.execute("SELECT role FROM UserData WHERE Email = %s", (email,))
+    result = cursor.fetchone()
+    return result[0] if result else 'user'

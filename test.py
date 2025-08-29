@@ -4,10 +4,10 @@ import tweepy
 import os
 from dotenv import load_dotenv
 load_dotenv()
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
-from bs4 import BeautifulSoup
+# from selenium import webdriver
+# from selenium.webdriver.chrome.service import Service
+# from webdriver_manager.chrome import ChromeDriverManager
+# from bs4 import BeautifulSoup
 import time
 # Your client ID and secret should be stored securely
 client_id = os.getenv("Client_ID")
@@ -96,18 +96,18 @@ user_access_token_secret = os.getenv("TWITTER_USER_ACCESS_TOKEN_SECRET")
 # print("Local time:", local_time.strftime("%H:%M:%S"))
 # print("Date:", local_time.strftime("%Y-%m-%d "))
 
-from cryptography.fernet import Fernet
-
-class APIKeyHandler:
-
-    def __init__(self):
-        self.fernet_key = Fernet.generate_key()
-        self.cipher = Fernet(self.fernet_key)
-
-    def encrypt_key(self,key):
-        return self.cipher.encrypt(key.encode()).decode()
-    def decrypt_key(self,encrypted_key):
-        return self.cipher.decrypt(encrypted_key.encode()).decode()
+# from cryptography.fernet import Fernet
+#
+# class APIKeyHandler:
+#
+#     def __init__(self):
+#         self.fernet_key = Fernet.generate_key()
+#         self.cipher = Fernet(self.fernet_key)
+#
+#     def encrypt_key(self,key):
+#         return self.cipher.encrypt(key.encode()).decode()
+#     def decrypt_key(self,encrypted_key):
+#         return self.cipher.decrypt(encrypted_key.encode()).decode()
 
 
 # a=APIKeyHandler()
@@ -136,29 +136,81 @@ class APIKeyHandler:
 
 
 
-import psycopg2
+# import psycopg2
+#
+#
+# def get_pg_connection():
+#     conn = psycopg2.connect(
+#         host= os.getenv("DB_HOST"),
+#         dbname=os.getenv("DB_NAME"),
+#         user=os.getenv("DB_USER"),
+#         password=os.getenv("DB_PASSWORD"),
+#         port=os.getenv("DB_PORT")
+#
+#
+#     )
+#
+#     return conn
+#
+#
+#
+# def check_user_exists(email):
+#     UserData_conn = get_pg_connection()
+#     cursor = UserData_conn.cursor()
+#     cursor.execute("SELECT 1 FROM UserData WHERE Email = %s ",(email,))
+#     exists = cursor.fetchone()
+#     return exists  is not None
+#
+# print(check_user_exists('chanurakarunanayake12@gmail.com'))
 
 
-def get_pg_connection():
-    conn = psycopg2.connect(
-        host= os.getenv("DB_HOST"),
-        dbname=os.getenv("DB_NAME"),
-        user=os.getenv("DB_USER"),
-        password=os.getenv("DB_PASSWORD"),
-        port=os.getenv("DB_PORT")
-
-
-    )
-
-    return conn
 
 
 
-def check_user_exists(email):
-    UserData_conn = get_pg_connection()
-    cursor = UserData_conn.cursor()
-    cursor.execute("SELECT 1 FROM UserData WHERE Email = %s ",(email,))
-    exists = cursor.fetchone()
-    return exists  is not None
 
-print(check_user_exists('chanurakarunanayake12@gmail.com'))
+#get list id
+import requests
+
+bearer_token = os.getenv("BEARER_TOKEN")
+user_id = 1741051650247139329  # You can get this via /2/users/by/username/:username
+
+url = f"https://api.twitter.com/2/users/{user_id}/owned_lists"
+headers = {
+    "Authorization": f"Bearer {bearer_token}",
+    "User-Agent": "v2OwnedListsLookup"
+}
+
+response = requests.get(url, headers=headers)
+print(response.json())
+
+
+
+
+
+
+
+#get user id
+# import requests
+#
+# bearer_token = os.getenv("BEARER_TOKEN")
+# username = "__Chanura__"  # Replace with your actual X handle (without @)
+#
+# url = f"https://api.twitter.com/2/users/by/username/{username}"
+# headers = {
+#     "Authorization": f"Bearer {bearer_token}",
+#     "User-Agent": "v2UserLookup"
+# }
+#
+# response = requests.get(url, headers=headers)
+# user_data = response.json()
+# print(user_data)
+#
+# # Extract user ID
+# user_id = user_data.get("data", {}).get("id")
+# print("Your user ID is:", user_id)
+
+
+
+
+
+
