@@ -99,3 +99,12 @@ def get_user_role(email):
     cursor.execute("SELECT role FROM UserData WHERE Email = %s", (email,))
     result = cursor.fetchone()
     return result[0] if result else 'user'
+
+
+def store_future_cast_data(email,context,Need_to_Publish,Platform_Name,Created_on,Status):
+    UserData_conn = get_pg_connection()
+    cursor = UserData_conn.cursor()
+    cursor.execute("INSERT INTO FutureCastData (Email,Context,Need_to_Publish,Platform_Name,Created_on,Status) VALUES (%s,%s,%s,%s,%s,%s)",(email,context,Need_to_Publish,Platform_Name,Created_on,Status))
+    UserData_conn.commit()
+    cursor.close()
+    UserData_conn.close()

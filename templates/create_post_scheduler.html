@@ -1,0 +1,31 @@
+ {% extends 'base.html' %}
+
+{% block body %}
+
+
+
+
+    <h1>Post Content</h1>
+    <form action="{{url_for('x_platform.future_post_page')}}" method="POST" id="auth-form">
+        <input type="datetime-local" name="future_post_data_time" placeholder="Time" class="input-field" required>
+        <textarea name="future_tweet_content" placeholder="Content" class="input-field" rows="5" cols="20"></textarea>
+
+        <label for="reply_settings_schedulePosts">Who can reply to this post?</label>
+        <select name="reply_settings_schedulePosts" class="input-field">
+            <option value="mentionedUsers">Mentioned Users</option>
+            <option value="following">Followings</option>
+            <option value="everyone">Everyone</option>
+        </select>
+
+        <input type="submit" value="POST"   class="btn btn-login">
+    </form>
+
+
+
+
+
+
+
+
+
+ {% endblock %}

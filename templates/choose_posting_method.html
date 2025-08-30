@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+    <form action="{{ url_for('x_platform.instant_post_page') }}" method="GET">
+        <button  type="submit" name="method">Instant Post</button>
+    </form>
+
+    <form action="{{ url_for('x_platform.future_post_page') }}" method="GET">
+        <button type="submit" name="method" >FutureCast</button>
+    </form>
+
+
+
+{% endblock %}

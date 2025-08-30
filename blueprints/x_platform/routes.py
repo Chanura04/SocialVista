@@ -5,14 +5,16 @@ import tweepy
 from flask import Blueprint, request, session, flash, redirect, url_for, render_template
 # Import your database and helper functions
 from database import check_user_exists, check_api_details, check_canPost, get_pg_connection, \
-    update_accountUpdatedOn_column
+    update_accountUpdatedOn_column,store_future_cast_data
 from helpers import APIKeyHandler, get_current_user_fernet_key
+from datetime import datetime
+from celery_worker import post_future_tweet_task
 
 twitter_bp = Blueprint('x_platform', __name__)
 
 
-@twitter_bp.route("/post_tweet", methods=["POST", "GET"])
-def post_tweet():
+@twitter_bp.route("/instant_post_page", methods=["POST", "GET"])
+def instant_post_page():
     if request.method == "POST":
         if session.get("email"):
             if check_api_details():
@@ -42,7 +44,7 @@ def post_tweet():
                     decrypt_twitter_user_access_token=api_key_handler_obj.decrypt_key(twitter_user_access_token)
                     decrypt_twitter_user_access_token_secret=api_key_handler_obj.decrypt_key(twitter_user_access_token_secret)
 
-                    print(f"""
+                    print(f"""instant_post_page
                     \n\n  Fernet key: {fernet_key_bytes}
                         decrypt twitter api key: {decrypt_twitter_api_key}\n
                         decrypt twitter api secret: {decrypt_twitter_api_secret}\n
@@ -50,12 +52,6 @@ def post_tweet():
                         decrypt twitter user access token secret: {decrypt_twitter_user_access_token_secret}""")
 
                     if twitter_api_key and twitter_api_secret and twitter_user_access_token and twitter_user_access_token_secret:
-                        # client = tweepy.Client(
-                        #     consumer_key=decrypt_twitter_api_key,
-                        #     consumer_secret=decrypt_twitter_api_secret,
-                        #     access_token=decrypt_twitter_user_access_token,
-                        #     access_token_secret=decrypt_twitter_user_access_token_secret
-                        # )
 
                         # Create an OAuth1Session object for authentication
                         oauth = OAuth1Session(
@@ -66,14 +62,15 @@ def post_tweet():
                         )
 
                         texts = request.form.get("tweet_content")
+                        reply_settings=request.form.get("reply_settings_instantPosts")
                         # The X API endpoint for creating a tweet
                         url = "https://api.x.com/2/tweets"
-
+                        print(F"reply settings: {reply_settings}")
                         # The JSON payload for the tweet with reply settings
                         # Options for 'reply_settings' are: 'mentionedUsers', 'following', 'everyone', 'verified'
                         payload = {
                             "text": texts,
-                            "reply_settings": "following"
+                            "reply_settings": reply_settings
                         }
                         try:
                             response = oauth.post(url, json=payload)
@@ -97,8 +94,18 @@ def post_tweet():
                 return redirect(url_for("x_platform.connect_twitter"))
         else:
             return redirect(url_for("auth.login"))
-        # After POST (success or fail), always return something
-    return render_template("post_content.html")
+    if request.method == "GET":
+        if session.get("email"):
+            if check_api_details():
+                return render_template("send_instant_post.html")
+            else:
+                return redirect(url_for("x_platform.connect_twitter"))
+        else:
+            return redirect(url_for("auth.login"))
+
+    # After POST (success or fail), always return something
+    # return redirect(url_for("auth.login"))
+    return render_template("send_instant_post.html")
 
 @twitter_bp.route("/connect_twitter", methods=["POST","GET"])
 def connect_twitter():
@@ -190,3 +197,112 @@ def connect_twitter():
             return redirect(url_for("auth.login"))
 
     return redirect(url_for("api_details.get_api_details"))
+
+@twitter_bp.route("/choose_posting_method", methods=["GET"])
+def choose_posting_method():
+    if request.method == "GET":
+        return  render_template("choose_posting_method.html")
+    return render_template("choose_posting_method.html")
+
+
+
+@twitter_bp.route("/future_post_page", methods=["POST", "GET"])
+def future_post_page():
+    if request.method == "POST":
+        if session.get("email"):
+            if check_api_details():
+                if check_user_exists(session['email']) and check_canPost():
+                    UserData_conn = get_pg_connection()
+                    cursor = UserData_conn.cursor()
+                    cursor.execute(
+                        "SELECT twitter_api_key,twitter_api_secret,twitter_access_token,twitter_access_token_secret,client_id,client_secret,screen_name FROM UserData WHERE Email = %s",
+                        (session['email'],))
+                    result = cursor.fetchone()
+
+                    twitter_api_key = result[0]
+                    twitter_api_secret = result[1]
+                    twitter_user_access_token = result[2]
+                    twitter_user_access_token_secret = result[3]
+
+                    # Get the key from DB (stored as string)
+                    fernet_key_str = get_current_user_fernet_key()
+
+                    # Convert back to bytes before using Fernet
+                    fernet_key_bytes = fernet_key_str.encode()
+
+                    api_key_handler_obj = APIKeyHandler(fernet_key=fernet_key_bytes)
+
+                    decrypt_twitter_api_key = api_key_handler_obj.decrypt_key(twitter_api_key)
+                    decrypt_twitter_api_secret = api_key_handler_obj.decrypt_key(twitter_api_secret)
+                    decrypt_twitter_user_access_token = api_key_handler_obj.decrypt_key(twitter_user_access_token)
+                    decrypt_twitter_user_access_token_secret = api_key_handler_obj.decrypt_key(
+                        twitter_user_access_token_secret)
+
+                    print(f"""future_post_page
+                    \n\n  Fernet key: {fernet_key_bytes}
+                        decrypt twitter api key: {decrypt_twitter_api_key}\n
+                        decrypt twitter api secret: {decrypt_twitter_api_secret}\n
+                        decrypt twitter user access token: {decrypt_twitter_user_access_token}\n
+                        decrypt twitter user access token secret: {decrypt_twitter_user_access_token_secret}""")
+
+                    if twitter_api_key and twitter_api_secret and twitter_user_access_token and twitter_user_access_token_secret:
+
+                        platform_name="X"
+                        local_time = datetime.now()
+                        created_on=local_time.strftime("%Y-%m-%d %H:%M:%S")
+
+                        context = request.form.get("future_tweet_content")
+                        need_to_publish = request.form.get("future_post_data_time")
+                        reply_settings=request.form.get("reply_settings_schedulePosts")
+                        print(F"reply settings: {reply_settings}")
+
+                        # The format string should match how the date is stored in DB
+                        future_post_data_time = datetime.strptime(need_to_publish, "%Y-%m-%dT%H:%M")
+
+                        check_validity = future_post_data_time >= local_time  # True if future, False if past
+
+                        if check_validity:
+                            status="Pending"
+                        else:
+                            status="Failed"
+
+                        if status and context and need_to_publish:
+                            store_future_cast_data(session['email'],context,need_to_publish,platform_name,created_on,status)
+                            try:
+                                post_future_tweet_task.apply_async(args=[session['email'], context,decrypt_twitter_api_key,decrypt_twitter_api_secret,decrypt_twitter_user_access_token,decrypt_twitter_user_access_token_secret,reply_settings], eta=future_post_data_time)
+                                flash(f"🎉 Your tweet has been scheduled for {future_post_data_time}!", "success")
+                                update_accountUpdatedOn_column(session['email'])
+
+                                print(f"form data time: {need_to_publish}")
+                                print(f"converted data time: {future_post_data_time}")
+                                print(f"texts: {context}")
+                                return redirect(url_for("x_platform.future_post_page"))
+                            except Exception as e:
+
+                                print(f"Error scheduling tweet: {e}")
+                        else:
+                            flash("⚠️ Please fill the required fields!")
+                            return redirect(url_for("x_platform.future_post_page"))
+
+                    else:
+                        flash("⚠️ Please fill in the API details first!")
+
+                else:
+                    flash("⚠️ Please login or check your permissions first!")
+
+            else:
+                return redirect(url_for("x_platform.connect_twitter"))
+        else:
+            return redirect(url_for("auth.login"))
+    if request.method == "GET":
+        if session.get("email"):
+            if check_api_details():
+                return render_template("create_post_scheduler.html")
+            else:
+                return redirect(url_for("x_platform.connect_twitter"))
+        else:
+            return redirect(url_for("auth.login"))
+
+        # After POST (success or fail), always return something
+    # return redirect(url_for("auth.login"))
+    return render_template("create_post_scheduler.html")

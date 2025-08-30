@@ -205,7 +205,7 @@ def post_tweet():
         return redirect(url_for("post_tweet"))
 
     # GET request
-    return render_template("post_content.html")
+    return render_template("choose_posting_method.html")
 
 
 

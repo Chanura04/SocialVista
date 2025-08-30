@@ -169,19 +169,19 @@ user_access_token_secret = os.getenv("TWITTER_USER_ACCESS_TOKEN_SECRET")
 
 
 #get list id
-import requests
-
-bearer_token = os.getenv("BEARER_TOKEN")
-user_id = 1741051650247139329  # You can get this via /2/users/by/username/:username
-
-url = f"https://api.twitter.com/2/users/{user_id}/owned_lists"
-headers = {
-    "Authorization": f"Bearer {bearer_token}",
-    "User-Agent": "v2OwnedListsLookup"
-}
-
-response = requests.get(url, headers=headers)
-print(response.json())
+# import requests
+#
+# bearer_token = os.getenv("BEARER_TOKEN")
+# user_id = 1741051650247139329  # You can get this via /2/users/by/username/:username
+#
+# url = f"https://api.twitter.com/2/users/{user_id}/owned_lists"
+# headers = {
+#     "Authorization": f"Bearer {bearer_token}",
+#     "User-Agent": "v2OwnedListsLookup"
+# }
+#
+# response = requests.get(url, headers=headers)
+# print(response.json())
 
 
 
@@ -208,6 +208,34 @@ print(response.json())
 # # Extract user ID
 # user_id = user_data.get("data", {}).get("id")
 # print("Your user ID is:", user_id)
+
+# (setup your client)
+
+# from dotenv import load_dotenv
+# load_dotenv()
+# # Your API credentials
+# consumer_key = os.getenv("TWITTER_API_KEY")
+# consumer_secret = os.getenv("TWITTER_API_SECRET")
+# access_token = os.getenv("TWITTER_ACCESS_TOKEN")
+# access_token_secret = os.getenv("TWITTER_ACCESS_TOKEN_SECRET")
+# user_id=1741051650247139329
+# client = tweepy.Client(
+#         consumer_key= twitter_api_key,
+#         consumer_secret= twitter_api_secret,
+#         access_token= twitter_access_token,
+#         access_token_secret= twitter_access_token_secret
+#     )
+# # Get the user's timeline
+# tweets = client.get_users_tweets(id=user_id)
+#
+# # Iterate through the tweets to get their IDs
+# for tweet in tweets.data:
+#     print(f"Tweet ID: {tweet.id}")
+#     print(f"Tweet Text: {tweet.text}")
+
+
+
+
 
 
 

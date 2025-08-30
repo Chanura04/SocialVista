@@ -13,7 +13,7 @@ from blueprints.api_details.routes import api_details_bp
 
 load_dotenv()
 
-# We can put some of the functions from app.py here as they are general purpose
+# We can put some functions from app.py here as they are general purpose
 def clear_session_files():
     for file in glob.glob("flask_session/*"):
         os.remove(file)

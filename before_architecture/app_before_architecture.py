@@ -308,7 +308,7 @@ def post_tweet():
         else:
             return redirect(url_for("login"))
         # After POST (success or fail), always return something
-    return render_template("post_content.html")
+    return render_template("choose_posting_method.html")
 
 
 def check_isFilledApiDetails():
