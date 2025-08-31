@@ -88,7 +88,7 @@ def connect_twitter():
                 session['canPost'] = False
                 return redirect(url_for("dashboard.dashboard"))
         else:
-            return redirect(url_for("login"))
+            return redirect(url_for("auth.login"))
     if request.method == "GET":
         if session.get("email"):
             if check_user_exists(session['email']):

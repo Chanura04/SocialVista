@@ -5,10 +5,11 @@ import tweepy
 from flask import Blueprint, request, session, flash, redirect, url_for, render_template
 # Import your database and helper functions
 from database import check_user_exists, check_api_details, check_canPost, get_pg_connection, \
-    update_accountUpdatedOn_column,store_future_cast_data
+    update_accountUpdatedOn_column,store_future_cast_data,store_instant_cast_data
 from helpers import APIKeyHandler, get_current_user_fernet_key
 from datetime import datetime
-from celery_worker import post_future_tweet_task
+from celery_worker import post_future_tweet_task,post_instant_tweet_task
+from zoneinfo import ZoneInfo
 
 twitter_bp = Blueprint('x_platform', __name__)
 
@@ -52,39 +53,34 @@ def instant_post_page():
                         decrypt twitter user access token secret: {decrypt_twitter_user_access_token_secret}""")
 
                     if twitter_api_key and twitter_api_secret and twitter_user_access_token and twitter_user_access_token_secret:
+                        sri_lanka_tz = ZoneInfo("Asia/Colombo")
 
-                        # Create an OAuth1Session object for authentication
-                        oauth = OAuth1Session(
-                            decrypt_twitter_api_key,
-                            client_secret=decrypt_twitter_api_secret,
-                            resource_owner_key=decrypt_twitter_user_access_token,
-                            resource_owner_secret=decrypt_twitter_user_access_token_secret,
-                        )
-
-                        texts = request.form.get("tweet_content")
+                        local_time = datetime.now(sri_lanka_tz)
+                        created_on = local_time.strftime("%Y-%m-%d %H:%M:%S")
+                        tweet_content = request.form.get("tweet_content")
+                        platform_Name="X"
                         reply_settings=request.form.get("reply_settings_instantPosts")
-                        # The X API endpoint for creating a tweet
-                        url = "https://api.x.com/2/tweets"
-                        print(F"reply settings: {reply_settings}")
-                        # The JSON payload for the tweet with reply settings
-                        # Options for 'reply_settings' are: 'mentionedUsers', 'following', 'everyone', 'verified'
-                        payload = {
-                            "text": texts,
-                            "reply_settings": reply_settings
-                        }
-                        try:
-                            response = oauth.post(url, json=payload)
-                            response.raise_for_status()  # Raises an HTTPError for bad responses
+                        post_instant_tweet_task.delay(session['email'], tweet_content,reply_settings,decrypt_twitter_api_key,decrypt_twitter_api_secret,decrypt_twitter_user_access_token,decrypt_twitter_user_access_token_secret)
+                        if tweet_content and reply_settings:
 
-                            # Print the API response
-                            print("Response status code:", response.status_code)
-                            json_response = response.json()
-                            print(json.dumps(json_response, indent=4))
-                            update_accountUpdatedOn_column(session['email'])
+                            store_instant_cast_data(session['email'],tweet_content,platform_Name,created_on,"Success")
+                            try:
+                                post_instant_tweet_task.delay(session['email'], tweet_content, reply_settings,
+                                                              decrypt_twitter_api_key, decrypt_twitter_api_secret,
+                                                              decrypt_twitter_user_access_token,
+                                                              decrypt_twitter_user_access_token_secret)
 
-                        except Exception as e:
-                            flash("Error posting tweet! Invalid API details...")
-                            print(f"Error posting tweet: {e}")
+                                update_accountUpdatedOn_column(session['email'])
+
+                                return redirect(url_for("x_platform.instant_post_page"))
+                            except Exception as e:
+
+                                print(f"Error scheduling tweet: {e}")
+                        else:
+                            flash("⚠️ Please fill the required fields!")
+                            return redirect(url_for("x_platform.instant_post_page"))
+
+
                     else:
                         flash("⚠️ Please fill in the API details first!")
                 else:
@@ -248,7 +244,9 @@ def future_post_page():
                     if twitter_api_key and twitter_api_secret and twitter_user_access_token and twitter_user_access_token_secret:
 
                         platform_name="X"
-                        local_time = datetime.now()
+                        sri_lanka_tz = ZoneInfo("Asia/Colombo")
+
+                        local_time = datetime.now(sri_lanka_tz)
                         created_on=local_time.strftime("%Y-%m-%d %H:%M:%S")
 
                         context = request.form.get("future_tweet_content")
@@ -258,20 +256,22 @@ def future_post_page():
 
                         # The format string should match how the date is stored in DB
                         future_post_data_time = datetime.strptime(need_to_publish, "%Y-%m-%dT%H:%M")
+                        future_post_data_time = future_post_data_time.replace(tzinfo=sri_lanka_tz)
 
                         check_validity = future_post_data_time >= local_time  # True if future, False if past
 
-                        if check_validity:
-                            status="Pending"
-                        else:
-                            status="Failed"
-
-                        if status and context and need_to_publish:
-                            store_future_cast_data(session['email'],context,need_to_publish,platform_name,created_on,status)
+                        if context and need_to_publish:
                             try:
                                 post_future_tweet_task.apply_async(args=[session['email'], context,decrypt_twitter_api_key,decrypt_twitter_api_secret,decrypt_twitter_user_access_token,decrypt_twitter_user_access_token_secret,reply_settings], eta=future_post_data_time)
                                 flash(f"🎉 Your tweet has been scheduled for {future_post_data_time}!", "success")
                                 update_accountUpdatedOn_column(session['email'])
+                                if check_validity:
+                                    status = "Success"
+                                else:
+                                    status = "Failed"
+
+                                store_future_cast_data(session['email'], context, need_to_publish, platform_name,
+                                                       created_on, status)
 
                                 print(f"form data time: {need_to_publish}")
                                 print(f"converted data time: {future_post_data_time}")

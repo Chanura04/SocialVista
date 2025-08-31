@@ -232,8 +232,14 @@ user_access_token_secret = os.getenv("TWITTER_USER_ACCESS_TOKEN_SECRET")
 # for tweet in tweets.data:
 #     print(f"Tweet ID: {tweet.id}")
 #     print(f"Tweet Text: {tweet.text}")
+from zoneinfo import ZoneInfo
+from datetime import datetime
+sri_lanka_tz = ZoneInfo("Asia/Colombo")
 
-
+# Current time in Sri Lanka
+local_time = datetime.now(sri_lanka_tz)
+created_on = local_time.strftime("%Y-%m-%d %H:%M:%S")
+print(created_on)
 
 
 
