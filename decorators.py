@@ -27,6 +27,7 @@ def has_role(required_role):
             role_hierarchy = {
                 'admin': ['admin', 'moderator', 'user'],
                 'moderator': ['moderator', 'user'],
+                'pro_user': ['pro_user', 'user'],
                 'user': ['user']
             }
 

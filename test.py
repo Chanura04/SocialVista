@@ -233,10 +233,33 @@ user_access_token_secret = os.getenv("TWITTER_USER_ACCESS_TOKEN_SECRET")
 #     print(f"Tweet ID: {tweet.id}")
 #     print(f"Tweet Text: {tweet.text}")
 
+import random
 
+from supabase import create_client
+import os
 
+def test_supabase_files_and_folders():
+    try:
+        url = os.environ.get("SUPABASE_URL")
+        key = os.environ.get("SUPABASE_KEY")
+        supabase = create_client(url, key)
 
+        # Corrected: Use an empty string to list all files, including those in subfolders
+        files = supabase.storage.from_("tweet-media").list(path='')
+        print("✅ Supabase connection successful! Files found:")
+        print(files)
+        return True
+    except Exception as e:
+        print(f"❌ Supabase connection failed! Error: {e}")
+        return False
 
+# Call the function to test the connection
+if test_supabase_files_and_folders():
+    # Your main code can run here
+    pass
+else:
+    # Handle the failed connection
+    pass
 
 
 

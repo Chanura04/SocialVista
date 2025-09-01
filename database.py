@@ -5,6 +5,7 @@ import os
 from dotenv import load_dotenv
 from datetime import datetime
 load_dotenv()
+from zoneinfo import ZoneInfo
 
 def get_pg_connection():
     conn = psycopg2.connect(
@@ -45,8 +46,10 @@ def check_user_exists(email):
 def update_accountUpdatedOn_column(email):
     UserData_conn = get_pg_connection()
     cursor = UserData_conn.cursor()
-    local_time = datetime.now()
-    cursor.execute("UPDATE UserData SET account_updated_on= %s WHERE Email = %s", (local_time.strftime("%Y-%m-%d %H:%M:%S"),email))
+    sri_lanka_tz = ZoneInfo("Asia/Colombo")
+    local_time = datetime.now(sri_lanka_tz)
+    updated_on = local_time.strftime("%Y-%m-%d %H:%M:%S")
+    cursor.execute("UPDATE UserData SET account_updated_on= %s WHERE Email = %s", (updated_on,email))
     UserData_conn.commit()
     cursor.close()
     UserData_conn.close()
@@ -108,3 +111,49 @@ def store_future_cast_data(email,context,Need_to_Publish,Platform_Name,Created_o
     UserData_conn.commit()
     cursor.close()
     UserData_conn.close()
+
+def store_instant_cast_data(email,context,Platform_Name,Created_on,Status):
+    UserData_conn = get_pg_connection()
+    cursor = UserData_conn.cursor()
+    cursor.execute("INSERT INTO FutureCastData (Email,Context,Platform_Name,Created_on,Status) VALUES (%s,%s,%s,%s,%s)",(email,context,Platform_Name,Created_on,Status))
+    UserData_conn.commit()
+    cursor.close()
+    UserData_conn.close()
+
+def get_pg_connections():
+    """Establishes a connection to the PostgreSQL database using environment variables."""
+    try:
+        connection_string = os.environ.get("DATABASE_URL")
+        conn = psycopg2.connect(connection_string)
+        return conn
+    except Exception as e:
+        print(f"Error connecting to the database: {e}")
+        return None
+    UserData_conn.close()
+
+def store_instant_media_files(email,context,file_name,file_path,Created_on,Status):
+    UserData_conn = get_pg_connection()
+    cursor = UserData_conn.cursor()
+    cursor.execute("INSERT INTO InstantMediaFiles (Email,Context,File_Name,File_Path,Created_on,Status) VALUES (%s,%s,%s,%s,%s,%s)",(email,context,file_name,file_path,Created_on,Status))
+    UserData_conn.commit()
+    cursor.close()
+    UserData_conn.close()
+
+def get_api_details(email):
+    UserData_conn = get_pg_connection()
+    cursor = UserData_conn.cursor()
+    cursor.execute("SELECT twitter_api_key,twitter_api_secret,twitter_access_token,twitter_access_token_secret,client_id,client_secret,screen_name FROM UserData WHERE Email = %s", (email,))
+    result = cursor.fetchone()
+    return result
+
+def update_api_details_staus(canPost,isFilledApiDetails,email) :
+    UserData_conn = get_pg_connection()
+    cursor = UserData_conn.cursor()
+    cursor.execute("""
+                   UPDATE UserData
+                   SET isFilledApiDetails = %s,
+                       canPost            = %s
+                   WHERE Email = %s
+                   """, (isFilledApiDetails, canPost, email))
+    cursor.close()
+    UserData_conn.commit()

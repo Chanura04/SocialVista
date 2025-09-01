@@ -2,7 +2,6 @@
 
 {% block body %}
 
-                        # Options for 'reply_settings' are: 'mentionedUsers', 'following', 'everyone', 'verified'
 
     <h1>Post Content</h1>
     <form action="{{url_for('x_platform.instant_post_page')}}" method="POST" id="auth-form">
@@ -10,9 +9,9 @@
         <textarea name="tweet_content" placeholder="Content" class="input-field" rows="5" cols="20"></textarea><br>
         <label for="reply_settings_instantPosts">Who can reply to this post?</label>
         <select name="reply_settings_instantPosts" class="input-field">
-            <option value="mentionedUsers">Mentioned Users</option>
+            <option value="mentionedUsers" disabled>Mentioned Users</option>
             <option value="following">Followings</option>
-            <option value="everyone">Everyone</option>
+            <option value="everyone" selected>Everyone</option>
         </select>
         <input type="submit" value="POST"   class="btn btn-login">
     </form>
