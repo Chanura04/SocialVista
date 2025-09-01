@@ -115,7 +115,7 @@ def store_future_cast_data(email,context,Need_to_Publish,Platform_Name,Created_o
 def store_instant_cast_data(email,context,Platform_Name,Created_on,Status):
     UserData_conn = get_pg_connection()
     cursor = UserData_conn.cursor()
-    cursor.execute("INSERT INTO FutureCastData (Email,Context,Platform_Name,Created_on,Status) VALUES (%s,%s,%s,%s,%s)",(email,context,Platform_Name,Created_on,Status))
+    cursor.execute("INSERT INTO InstantCastData (Email,Context,Platform_Name,Created_on,Status) VALUES (%s,%s,%s,%s,%s)",(email,context,Platform_Name,Created_on,Status))
     UserData_conn.commit()
     cursor.close()
     UserData_conn.close()

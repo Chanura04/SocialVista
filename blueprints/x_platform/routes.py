@@ -5,7 +5,7 @@ import tweepy
 from flask import Blueprint, request, session, flash, redirect, url_for, render_template
 # Import your database and helper functions
 from database import check_user_exists, check_api_details, check_canPost, get_pg_connection, \
-    update_accountUpdatedOn_column,add_X_api_details, store_future_cast_data,store_instant_cast_data,get_api_details,update_api_details_staus
+    update_accountUpdatedOn_column,add_X_api_details, store_future_cast_data,get_api_details,update_api_details_staus
 from helpers import APIKeyHandler, get_current_user_fernet_key
 from datetime import datetime
 from celery_worker import post_future_tweet_task,post_instant_tweet_task

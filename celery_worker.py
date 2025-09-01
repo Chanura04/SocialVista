@@ -10,15 +10,18 @@ load_dotenv()
 from database import update_accountUpdatedOn_column,store_instant_cast_data,store_future_cast_data,store_instant_media_files
 from zoneinfo import ZoneInfo
 from datetime import datetime
-
+from supabase import create_client
+import tempfile
+import os
+from werkzeug.utils import secure_filename
+import random
 
 # Set up Celery. The broker is Redis, and the backend is for storing task results.
 celery = Celery(
     "tasks",
     broker=os.environ.get("CELERY_BROKER_URL"),
     backend=os.environ.get("CELERY_RESULT_BACKEND")
-    # broker="redis://localhost:6379/0",
-    # backend="redis://localhost:6379/0"
+
 )
 
 @celery.task(bind=True)
@@ -44,21 +47,41 @@ def post_instant_tweet_task(self,email,platform_Name,tweet_text,reply_settings,d
         sri_lanka_tz = ZoneInfo("Asia/Colombo")
         local_time = datetime.now(sri_lanka_tz)
         created_on = local_time.strftime("%Y-%m-%d %H:%M:%S")
-        store_instant_cast_data(
-            email,
-            tweet_text,
-            platform_Name,
-            created_on,
-            "Success"
-        )
+
         try:
             response = oauth.post(url, json=payload)
             response.raise_for_status()  # Raises an HTTPError for bad responses
-
+            store_instant_cast_data(
+                email,
+                tweet_text,
+                platform_Name,
+                created_on,
+                "Success"
+            )
             # Print the API response
             print("Response status code:", response.status_code)
             json_response = response.json()
             print(json.dumps(json_response, indent=4))
+        except tweepy.errors.TweepyException as e:
+
+            error_msg = f"Twitter API Error: {e}"
+            print(f"Twitter API Error: {e}")
+            try:
+                created_on = datetime.now(ZoneInfo("UTC"))
+                store_instant_cast_data(
+                    email,
+                    tweet_text,
+                    platform_Name,
+                    created_on,
+                    f"Failed: {str(e)}"
+                )
+
+
+            except Exception as db_error:
+
+                print(f"Database storage warning: {db_error}")
+
+            return {"status": "error", "message": error_msg}
 
 
         except Exception as e:
@@ -67,8 +90,9 @@ def post_instant_tweet_task(self,email,platform_Name,tweet_text,reply_settings,d
 
         return True
     except Exception as e:
-        print(f"Error posting tweet for {email}: {e}")
-        return False
+        error_msg = f"Task initialization error: {e}"
+        print(error_msg)
+        return {"status": "error", "message": error_msg}
 
 
 
@@ -110,19 +134,29 @@ def post_future_tweet_task( self,email,need_to_publish, tweet_text,decrypt_twitt
             print(json.dumps(json_response, indent=4))
 
 
-        except Exception as e:
 
-            print(f"Error posting tweet: {e}")
+        except tweepy.errors.TweepyException as e:
+
+            error_msg = f"Twitter API Error: {e}"
+            print(f"Twitter API Error: {e}")
+            try:
+                created_on = datetime.now(ZoneInfo("UTC"))
+                store_future_cast_data(email, tweet_text, need_to_publish, platform_name, created_on, f"Failed: {str(e)}")
+
+
+            except Exception as db_error:
+
+                print(f"Database storage warning: {db_error}")
+
+            return {"status": "error", "message": error_msg}
 
         return True
     except Exception as e:
-        print(f"Error posting tweet for {email}: {e}")
-        return False
-from supabase import create_client
-import tempfile
-import os
-from werkzeug.utils import secure_filename
-import random
+        error_msg = f"Task initialization error: {e}"
+        print(error_msg)
+        return {"status": "error", "message": error_msg}
+
+
 
 
 @celery.task(bind=True)
