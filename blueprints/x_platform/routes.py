@@ -5,7 +5,7 @@ import tweepy
 from flask import Blueprint, request, session, flash, redirect, url_for, render_template
 # Import your database and helper functions
 from database import check_user_exists, check_api_details, check_canPost, get_pg_connection, \
-    update_accountUpdatedOn_column,store_future_cast_data,store_instant_cast_data,get_api_details,update_api_details_staus
+    update_accountUpdatedOn_column,add_X_api_details, store_future_cast_data,store_instant_cast_data,get_api_details,update_api_details_staus
 from helpers import APIKeyHandler, get_current_user_fernet_key
 from datetime import datetime
 from celery_worker import post_future_tweet_task,post_instant_tweet_task
@@ -119,17 +119,28 @@ def connect_twitter():
                 encrypted_client_secret=api_key_handler_obj.encrypt_key(client_secret)
                 encrypted_screen_name=api_key_handler_obj.encrypt_key(screen_name)
 
-                UserData_conn = get_pg_connection()
-                cursor = UserData_conn.cursor()
-                cursor.execute(
-                        """
-                                   UPDATE UserData
-                                   SET  twitter_api_key = %s,twitter_api_secret = %s,twitter_access_token = %s,twitter_access_token_secret = %s,
-                                        client_id = %s,client_secret = %s ,screen_name = %s
-                                   WHERE Email = %s
-                                """,
-                                   (
-                                            encrypted_twitter_api_key,
+                # UserData_conn = get_pg_connection()
+                # cursor = UserData_conn.cursor()
+                # cursor.execute(
+                #         """
+                #                    UPDATE UserData
+                #                    SET  twitter_api_key = %s,twitter_api_secret = %s,twitter_access_token = %s,twitter_access_token_secret = %s,
+                #                         client_id = %s,client_secret = %s ,screen_name = %s
+                #                    WHERE Email = %s
+                #                 """,
+                #                    (
+                #                             encrypted_twitter_api_key,
+                #                             encrypted_twitter_api_secret,
+                #                             encrypted_twitter_access_token,
+                #                             encrypted_twitter_access_token_secret,
+                #                             encrypted_client_id,
+                #                             encrypted_client_secret,
+                #                             encrypted_screen_name,
+                #                             session['email'])
+                #                     )
+                # cursor.close()
+                # UserData_conn.commit()
+                add_X_api_details(encrypted_twitter_api_key,
                                             encrypted_twitter_api_secret,
                                             encrypted_twitter_access_token,
                                             encrypted_twitter_access_token_secret,
@@ -137,9 +148,6 @@ def connect_twitter():
                                             encrypted_client_secret,
                                             encrypted_screen_name,
                                             session['email'])
-                                    )
-                cursor.close()
-                UserData_conn.commit()
 
                 # UserData_conn = get_pg_connection()
                 # cursor = UserData_conn.cursor()

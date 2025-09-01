@@ -157,3 +157,38 @@ def update_api_details_staus(canPost,isFilledApiDetails,email) :
                    """, (isFilledApiDetails, canPost, email))
     cursor.close()
     UserData_conn.commit()
+
+def add_X_api_details(encrypted_twitter_api_key,
+                                            encrypted_twitter_api_secret,
+                                            encrypted_twitter_access_token,
+                                            encrypted_twitter_access_token_secret,
+                                            encrypted_client_id,
+                                            encrypted_client_secret,
+                                            encrypted_screen_name,
+                                            email):
+    UserData_conn = get_pg_connection()
+    cursor = UserData_conn.cursor()
+    cursor.execute(
+        """
+        UPDATE UserData
+        SET twitter_api_key             = %s,
+            twitter_api_secret          = %s,
+            twitter_access_token        = %s,
+            twitter_access_token_secret = %s,
+            client_id                   = %s,
+            client_secret               = %s,
+            screen_name                 = %s
+        WHERE Email = %s
+        """,
+        (
+            encrypted_twitter_api_key,
+            encrypted_twitter_api_secret,
+            encrypted_twitter_access_token,
+            encrypted_twitter_access_token_secret,
+            encrypted_client_id,
+            encrypted_client_secret,
+            encrypted_screen_name,
+            email)
+    )
+    cursor.close()
+    UserData_conn.commit()
