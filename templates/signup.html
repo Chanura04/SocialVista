@@ -1,18 +1,21 @@
 {% extends 'base.html' %}
 
 {% block body %}
-<div class="container">
-    <h1>Signup</h1>
-    <form action="{{url_for('auth.signup')}}" method="POST" id="auth-form">
-        <input type="text" name="first_name" placeholder="First Name" class="input-field" required>
-        <input type="text" name="last_name" placeholder="Last Name" class="input-field" required>
-        <input type="email" name="email" placeholder="Email" class="input-field" required>
-        <input type="password" name="password" placeholder="Password" class="input-field" required>
-        <input type="submit" value="Submit" class="btn btn-login">
-        <input type="button" value="Login" class="btn btn-login" onclick="window.location.href='{{ url_for('auth.login') }}'">
 
-    </form>
-</div>
+        <div class="container">
+                     <br>
+            <h2 class="form_head_topic">Signup</h2>
+            <form action="{{url_for('auth.signup')}}" method="POST" id="auth-form">
+                <input type="text" name="first_name" placeholder="First Name" class="input-field" required>
+                <input type="text" name="last_name" placeholder="Last Name" class="input-field" required>
+                <input type="email" name="email" placeholder="Email" class="input-field" required>
+                <input type="password" name="password" placeholder="Password" class="input-field" required>
+                <input type="submit" value="Submit" class="btn btn-login">
+                <input type="button" value="Login" class="btn btn-login" onclick="window.location.href='{{ url_for('auth.login') }}'">
+
+            </form>
+        </div>
+
 
 
 {% endblock %}

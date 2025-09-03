@@ -1,19 +1,55 @@
 {% extends 'base.html' %}
 
 {% block body %}
+    <div class="dashboard-container">
 
-    <form action="{{ url_for('x_platform.instant_post_page') }}" method="GET">
-        <button  type="submit" name="method">Instant Post</button>
-    </form>
+       <div class="sidebar">
+               <h2>Social Vista</h2>
+            <nav class="sidebar-nav">
+                <a href="{{ url_for('home.home') }}">🏠 Home</a>
+                <a href="{{ url_for('dashboard.dashboard') }}">🚪 Dashboard</a>
 
-    <form action="{{ url_for('x_platform.future_post_page') }}" method="GET">
-        <button type="submit" name="method" >FutureCast</button>
-    </form>
+            <p>✨ Select Platform</p>
+            <select name="platform" id="platform" class="sidebar-select" onchange="if(this.value) window.location.href=this.value">
+                <option value="" selected>X</option>
+                <option value="{{ url_for('x_platform.choose_posting_method') }}">🐦 Post to X</option>
+                <option value="{{ url_for('api_details.show_api_credentials') }}">🔑 API Details</option>
+                <option value="{{ url_for('api_details.connect_twitter') }}">🔗 Connect X</option>
+            </select>
+             <select name="platform" id="platform" class="sidebar-select" onchange="if(this.value) window.location.href=this.value">
+                <option value="" selected>Facebook</option>
+                <option value="{{ url_for('x_platform.choose_posting_method') }}">🐦 Post to Facebook</option>
+                <option value="{{ url_for('api_details.show_api_credentials') }}">🔑 API Details</option>
+                <option value="{{ url_for('api_details.connect_twitter') }}">🔗 Connect Facebook</option>
+            </select>
+            <select name="platform" id="platform" class="sidebar-select" onchange="if(this.value) window.location.href=this.value">
+                <option value="" selected>Instagram</option>
+                <option value="{{ url_for('x_platform.choose_posting_method') }}">🐦 Post to Instagram</option>
+                <option value="{{ url_for('api_details.show_api_credentials') }}">🔑 API Details</option>
+                <option value="{{ url_for('api_details.connect_twitter') }}">🔗 Connect Instagram</option>
+            </select>
+                <a href="{{ url_for('auth.logout') }}" class="btn-logout">🚪 Logout</a>
+            </nav>
+      </div>
+
+         <div class="main-content">
+            <form action="{{ url_for('x_platform.instant_post_page') }}" method="GET" class="form-method_chooser">
+                <button  type="submit" name="method">Instant Post</button>
+            </form>
+
+            <form action="{{ url_for('x_platform.future_post_page') }}" method="GET" class="form-method_chooser">
+                <button type="submit" name="method" >FutureCast</button>
+            </form>
 
 
-    <form action="{{ url_for('x_platform_pro_users.post_instant_media_files') }}" method="GET">
-        <button type="submit" name="method" >post medias</button>
-    </form>
+            <form action="{{ url_for('x_platform_pro_users.post_instant_media_files') }}" method="GET" class="form-method_chooser">
+                <button type="submit" name="method" >Post Instant Medias</button>
+            </form>
+             <form action="{{ url_for('x_platform_pro_users.post_futureCast_medias_f_pro_users') }}" method="GET" class="form-method_chooser">
+                <button type="submit" name="method" >Post FutureCast Medias</button>
+            </form>
+         </div>
+    </div>
 
 
 

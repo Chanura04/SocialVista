@@ -1,21 +1,66 @@
 {% extends 'base.html' %}
 
 {% block body %}
+    <div class="dashboard-container">
+
+       <div class="sidebar">
+               <h2>Social Vista</h2>
+            <nav class="sidebar-nav">
+                <a href="{{ url_for('home.home') }}">🏠 Home</a>
+                <a href="{{ url_for('dashboard.dashboard') }}">🚪 Dashboard</a>
+
+            <p>✨ Select Platform</p>
+            <select name="platform" id="platform" class="sidebar-select" onchange="if(this.value) window.location.href=this.value">
+                <option value="" selected>X</option>
+                <option value="{{ url_for('x_platform.choose_posting_method') }}">🐦 Post to X</option>
+                <option value="{{ url_for('api_details.show_api_credentials') }}">🔑 API Details</option>
+                <option value="{{ url_for('api_details.connect_twitter') }}">🔗 Connect X</option>
+            </select>
+             <select name="platform" id="platform" class="sidebar-select" onchange="if(this.value) window.location.href=this.value">
+                <option value="" selected>Facebook</option>
+                <option value="{{ url_for('x_platform.choose_posting_method') }}">🐦 Post to Facebook</option>
+                <option value="{{ url_for('api_details.show_api_credentials') }}">🔑 API Details</option>
+                <option value="{{ url_for('api_details.connect_twitter') }}">🔗 Connect Facebook</option>
+            </select>
+            <select name="platform" id="platform" class="sidebar-select" onchange="if(this.value) window.location.href=this.value">
+                <option value="" selected>Instagram</option>
+                <option value="{{ url_for('x_platform.choose_posting_method') }}">🐦 Post to Instagram</option>
+                <option value="{{ url_for('api_details.show_api_credentials') }}">🔑 API Details</option>
+                <option value="{{ url_for('api_details.connect_twitter') }}">🔗 Connect Instagram</option>
+            </select>
+                <a href="{{ url_for('auth.logout') }}" class="btn-logout">🚪 Logout</a>
+            </nav>
+      </div>
+
 
 <!-- Connect Twitter Form -->
-<form method="POST" action="{{ url_for('api_details.connect_twitter') }}">
-  <input type="text" name="screen_name" placeholder="Account Name" required>
-  <input type="text" name="api_key" placeholder="API Key" required>
-  <input type="text" name="api_secret" placeholder="API Secret" required>
-  <input type="text" name="access_token" placeholder="Access Token" required>
-  <input type="text" name="access_token_secret" placeholder="Access Token Secret" required>
-  <input type="text" name="client_id" placeholder="Client ID " required>
-  <input type="text" name="client_secret" placeholder="Client Secret " required>
+         <div class="main-content">
+                <br>
+            <h2 class="form_head_topic">Connect X</h2>
+            <form method="POST" action="{{ url_for('api_details.connect_twitter') }}" id="auth-form">
 
-  <button type="submit">Connect Twitter</button>
-</form>
+                <label for="screen_name">Enter Account Name:</label>
+                    <input type="text" name="screen_name" placeholder="Account Name" required class="input-field">
+                <label for="api_key">Enter API Key:</label>
+                    <input type="text" name="api_key" placeholder="API Key" required class="input-field">
+                <label for="api_secret">Enter API Secret:</label>
+                    <input type="text" name="api_secret" placeholder="API Secret" required class="input-field">
+                <label for="access_token">Enter Access Token:</label>
+                    <input type="text" name="access_token" placeholder="Access Token" required class="input-field">
+                <label for="access_token_secret">Enter Access Token Secret:</label>
+                    <input type="text" name="access_token_secret" placeholder="Access Token Secret" required class="input-field">
+                <label for="client_id">Enter Client ID:</label>
+                    <input type="text" name="client_id" placeholder="Client ID " required class="input-field">
+                <label for="client_secret">Enter Client Secret:</label>
+                    <input type="text" name="client_secret" placeholder="Client Secret " required class="input-field">
 
-<hr>
+              <button type="submit" class="btn btn-login">Submit</button>
+            </form>
+         </div>
+    </div>
+
+
+
 
 
 

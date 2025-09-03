@@ -32,17 +32,16 @@
             </nav>
       </div>
 
-
         <div class="main-content">
+
             <br>
             <h2 class="form_head_topic">Post Content</h2>
-
-            <form action="{{url_for('x_platform_pro_users.post_instant_media_files')}}" enctype="multipart/form-data" method="POST" id="auth-form">
+            <form action="{{url_for('x_platform_pro_users.post_futureCast_medias_f_pro_users')}}" enctype="multipart/form-data" method="POST" id="auth-form">
 
                 <div class="form-group">
-                        <label for="tweet_context_f_media">Text:</label>
+                        <label for="tweet_context_f_futureCast_media">Text: </label>
                         <textarea
-                            name="tweet_context_f_media"
+                            name="tweet_context_f_futureCast_media"
                             id="tweet_context_f_media"
                             placeholder="What's happening?"
                             class="input-field"
@@ -54,11 +53,11 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="instant_media_file">Media File</label>
+                        <label for="instant_futureCast_media_file">Media File</label>
                         <div class="file-input-wrapper">
                             <input
                                 type="file"
-                                name="instant_media_file"
+                                name="instant_futureCast_media_file"
                                 id="instant_media_file"
                                 class="file-input"
                                 accept=".png,.jpg,.jpeg,.gif,.webp,.mp4,.mov,.avi"
@@ -69,6 +68,8 @@
                             </div>
                         </div>
                     </div>
+                 <label for="future_mediaPost_time">Time:</label>
+                 <input type="datetime-local" name="future_mediaPost_time" placeholder="Time" class="input-field" required>
 
                     <button type="submit" class="btn-post">
                         🚀 Post to X

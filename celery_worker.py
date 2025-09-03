@@ -7,7 +7,7 @@ import requests
 from requests_oauthlib import OAuth1Session
 import json
 load_dotenv()
-from database import update_accountUpdatedOn_column,store_instant_cast_data,store_future_cast_data,store_instant_media_files
+from database import store_future_cast_Media_data,update_accountUpdatedOn_column,store_instant_cast_data,store_future_cast_data,store_instant_media_files
 from zoneinfo import ZoneInfo
 from datetime import datetime
 from supabase import create_client
@@ -122,9 +122,10 @@ def post_future_tweet_task( self,email,need_to_publish, tweet_text,decrypt_twitt
         local_time = datetime.now(sri_lanka_tz)
         created_on = local_time.strftime("%Y-%m-%d %H:%M:%S")
         status = "Success"
-        store_future_cast_data(email, tweet_text, need_to_publish, platform_name, created_on, status)
 
         try:
+            store_future_cast_data(email, tweet_text, need_to_publish, platform_name, created_on, status)
+
             response = oauth.post(url, json=payload)
             response.raise_for_status()  # Raises an HTTPError for bad responses
 
@@ -277,6 +278,142 @@ def post_instant_media_task(
                 store_instant_media_files(
                     email,
                     tweet_text,
+                    file_content.filename,
+                    file_content.content_type,
+                    created_on,
+                    f"Failed: {str(e)}"
+                )
+            except Exception as db_error:
+                print(f"Database storage warning: {db_error}")
+            return {"status": "error", "message": error_msg}
+        except Exception as e:
+            error_msg = f"General Error: {e}"
+            print(error_msg)
+            return {"status": "error", "message": error_msg}
+
+        finally:
+                # Clean up temp file
+                if temp_file_path and os.path.exists(temp_file_path):
+                    try:
+                        os.unlink(temp_file_path)
+                        print("Temporary file cleaned up")
+                    except Exception as cleanup_error:
+                        print(f"Warning: Could not clean up temp file: {cleanup_error}")
+
+    except Exception as e:
+            error_msg = f"Task initialization error: {e}"
+            print(error_msg)
+            return {"status": "error", "message": error_msg}
+
+@celery.task(bind=True)
+def post_future_media_task(self,email,need_to_publish,tweet_text,file_extension, file_content,original_filename,content_type, decrypt_twitter_api_key,
+                              decrypt_twitter_api_secret, decrypt_twitter_user_access_token,
+                              decrypt_twitter_user_access_token_secret):
+    """
+    A Celery task to post a tweet with media by uploading the file content directly.
+    """
+    try:
+        # Initialize Twitter API clients
+        auth_v1 = tweepy.OAuth1UserHandler(
+            decrypt_twitter_api_key, decrypt_twitter_api_secret,
+            decrypt_twitter_user_access_token, decrypt_twitter_user_access_token_secret
+        )
+        api = tweepy.API(auth_v1)
+
+        client = tweepy.Client(
+            consumer_key=decrypt_twitter_api_key,
+            consumer_secret=decrypt_twitter_api_secret,
+            access_token=decrypt_twitter_user_access_token,
+            access_token_secret=decrypt_twitter_user_access_token_secret
+        )
+
+        # Upload to Supabase for backup/storage
+        SUPABASE_URL = os.getenv("SUPABASE_URL")
+        SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+        supabase_filename = None
+        platform_name = "X"
+        if SUPABASE_URL and SUPABASE_KEY:
+            try:
+                supabase_client = create_client(SUPABASE_URL, SUPABASE_KEY)
+
+                # Generate random filename
+                random_chars = ''.join(random.choices('abcdefghijklmnopqrstuvwxyz', k=3))
+                random_num = random.randint(1, 10000)
+                secure_original_filename = secure_filename(original_filename)
+                extension = secure_original_filename.rsplit('.', 1)[-1].lower()
+                supabase_filename = f"{random_chars}{random_num}.{extension}"
+
+
+
+
+                # Upload to Supabase
+                res = supabase_client.storage.from_("tweet-media").upload(
+                    supabase_filename,
+                    file_content,#Direct bytes upload
+                    {"content-type": content_type}
+                )
+
+                if res.get("error"):
+                    print(f"Supabase upload warning: {res['error']['message']}")
+                else:
+                    public_url = supabase_client.storage.from_("tweet-media").get_public_url(supabase_filename)
+                    print(f"Backup stored at: {public_url}")
+
+            except Exception as e:
+                print(f"Supabase upload warning: {e}")
+                # Continue with Twitter upload even if Supabase fails
+
+        # Upload media to Twitter
+        temp_file_path = None
+        try:
+            # Create temporary file for Twitter upload
+            with tempfile.NamedTemporaryFile(delete=False, suffix=f'.{file_extension}') as temp_file:
+                temp_file.write(file_content)  # ✅ Write bytes to temp file
+                temp_file_path = temp_file.name
+
+            # Upload using the temporary file path
+            media_upload = api.media_upload(temp_file_path)
+            media_id = media_upload.media_id
+            print(f"Media uploaded to Twitter successfully. Media ID: {media_id}")
+
+
+            # Create tweet with media
+            response = client.create_tweet(
+                text=tweet_text,
+                media_ids=[media_id]
+            )
+
+            # Store record in database
+            try:
+                created_on = datetime.now(ZoneInfo("UTC"))
+                store_future_cast_Media_data(
+                    email,
+                    tweet_text,need_to_publish, platform_name,
+                    file_content.filename,
+                    file_content.content_type,
+                    created_on,
+                    "Success"
+                )
+                update_accountUpdatedOn_column(email)
+            except Exception as db_error:
+                print(f"Database storage warning: {db_error}")
+
+
+            print("Tweet posted successfully!")
+            print(json.dumps(response.data, indent=4))
+
+        except tweepy.errors.TweepyException as e:
+            error_msg = f"Twitter API Error: {e}"
+
+            print(f"Twitter API Error: {e}")
+
+            # Store failed attempt in database
+            try:
+                created_on = datetime.now(ZoneInfo("UTC"))
+                created_on = datetime.now(ZoneInfo("UTC"))
+                store_future_cast_Media_data(
+                    email,
+                    tweet_text, need_to_publish, platform_name,
                     file_content.filename,
                     file_content.content_type,
                     created_on,

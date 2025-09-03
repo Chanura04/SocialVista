@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<div class="dashboard-container">
+  {% if username %}
+       <div class="sidebar">
+               <h2>Social Vista</h2>
+            <nav class="sidebar-nav">
+                <a href="{{ url_for('home.home') }}">🏠 Home</a>
+                <a href="{{ url_for('dashboard.dashboard') }}">🚪 Dashboard</a>
+
+            <p>✨ Select Platform</p>
+            <select name="platform" id="platform" class="sidebar-select" onchange="if(this.value) window.location.href=this.value">
+                <option value="" selected>X</option>
+                <option value="{{ url_for('x_platform.choose_posting_method') }}">🐦 Post to X</option>
+                <option value="{{ url_for('api_details.show_api_credentials') }}">🔑 API Details</option>
+                <option value="{{ url_for('api_details.connect_twitter') }}">🔗 Connect X</option>
+            </select>
+             <select name="platform" id="platform" class="sidebar-select" onchange="if(this.value) window.location.href=this.value">
+                <option value="" selected>Facebook</option>
+                <option value="{{ url_for('x_platform.choose_posting_method') }}">🐦 Post to Facebook</option>
+                <option value="{{ url_for('api_details.show_api_credentials') }}">🔑 API Details</option>
+                <option value="{{ url_for('api_details.connect_twitter') }}">🔗 Connect Facebook</option>
+            </select>
+            <select name="platform" id="platform" class="sidebar-select" onchange="if(this.value) window.location.href=this.value">
+                <option value="" selected>Instagram</option>
+                <option value="{{ url_for('x_platform.choose_posting_method') }}">🐦 Post to Instagram</option>
+                <option value="{{ url_for('api_details.show_api_credentials') }}">🔑 API Details</option>
+                <option value="{{ url_for('api_details.connect_twitter') }}">🔗 Connect Instagram</option>
+            </select>
+                <a href="{{ url_for('auth.logout') }}" class="btn-logout">🚪 Logout</a>
+            </nav>
+      </div>
+
+  {% else %}
+    <div class="sidebar">
+            <h2>Social Vista</h2>
+            <nav class="sidebar-nav">
+                <a href="{{ url_for('home.home') }}">🏠 Home</a>
+                <a href="{{ url_for('auth.login') }}">🚪 Dashboard</a>
+
+            </nav>
+    </div>
+
+  {% endif %}
+
+    <div class="main-content">
+        <div class="welcome-content">
+            <div class="hero-section">
+                <h1 class="hero-title">Social Vista ✨</h1>
+                <p class="hero-subtitle">Your all-in-one platform for managing and scheduling social media posts. Say goodbye to the hassle of logging into multiple accounts—streamline your workflow and focus on creating amazing content!</p>
+            </div>
+
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🔐</div>
+                    <h3 class="feature-title">
+                        Secure & Simple Authentication
+                    </h3>
+                    <p class="feature-description">
+                        Get started in minutes with our secure login and signup system. Your account is protected by industry-standard password hashing, ensuring your information is always safe and sound.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🛡️</div>
+                    <h3 class="feature-title">
+                        Encrypted API Credentials
+                    </h3>
+                    <p class="feature-description">
+                        We understand that your API keys are sensitive. When you connect your social media accounts, we encrypt your credentials with a unique key, so your data is never stored in plain text.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🔗</div>
+                    <h3 class="feature-title">
+                        Seamless Integration
+                    </h3>
+                    <p class="feature-description">
+                        Connect your Twitter account effortlessly to post content directly from our platform. No more juggling multiple tabs or apps—everything you need is right here.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">⏰</div>
+                    <h3 class="feature-title">
+                        Smart Scheduling
+                    </h3>
+                    <p class="feature-description">
+                        Our most powerful feature! Schedule tweets for any future date and time. Write your post, pick a time, and our system handles the rest—posting your content even when you're offline.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3 class="feature-title">
+                        Professional Dashboard
+                    </h3>
+                    <p class="feature-description">
+                        Your personal command center provides a clear overview of your account activity. View scheduled posts, pending content, and get a complete snapshot of your account's performance.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🚀</div>
+                    <h3 class="feature-title">
+                        Lightning Fast
+                    </h3>
+                    <p class="feature-description">
+                        Built with modern technology and optimized for speed. Our powerful background job system ensures you never have to wait—schedule posts instantly and let our platform do the work.
+                    </p>
+                </div>
+            </div>
+
+            <div class="how-it-works">
+                <h2 class="section-title">How It Works ⚙️</h2>
+                <div class="steps-container">
+                    <div class="step-item">
+                        <div class="step-number">1</div>
+                        <h3 class="step-title">Sign Up & Log In</h3>
+                        <p class="step-description">Create your account in seconds with our streamlined signup process. Secure, fast, and hassle-free.</p>
+                    </div>
+
+                    <div class="step-item">
+                        <div class="step-number">2</div>
+                        <h3 class="step-title">Connect Your Accounts</h3>
+                        <p class="step-description">Use the "Connect Twitter" option to securely add your API credentials. Your data is encrypted and protected.</p>
+                    </div>
+
+                    <div class="step-item">
+                        <div class="step-number">3</div>
+                        <h3 class="step-title">Create & Schedule</h3>
+                        <p class="step-description">Write your content and choose when to post. Immediate or scheduled—our system handles everything seamlessly.</p>
+                    </div>
+
+                    <div class="step-item">
+                        <div class="step-number">4</div>
+                        <h3 class="step-title">Monitor & Manage</h3>
+                        <p class="step-description">Track your activity with our beautiful dashboard. Get insights and manage all your content from one place.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cta-section">
+                <div class="cta-content">
+                    <h2 class="section-title">Ready to Transform Your Social Media Game? 🎯</h2>
+                    <p class="hero-subtitle">Join thousands of content creators who trust Social Vista to manage their social media presence. Start your journey today!</p>
+                    <div class="cta-buttons">
+                        <a href="{{ url_for('auth.login') }}" class="btn btn-primary">🚀 Get Started - Login</a>
+                        <a href="{{ url_for('auth.signup') }}" class="btn btn-secondary">✨ Create Account</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+    </div>
+
+</div>
+{% endblock %}

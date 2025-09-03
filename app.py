@@ -11,6 +11,7 @@ from blueprints.x_platform.routes import twitter_bp
 from blueprints.dashboard.routes import dashboard_bp
 from blueprints.api_details.routes import api_details_bp
 from blueprints.x_platform_pro_users import twitter_pro_users_bp
+from blueprints.home import home_bp
 load_dotenv()
 
 # We can put some functions from app.py here as they are general purpose
@@ -24,11 +25,12 @@ def create_app():
 
     # Register blueprints
     app.register_blueprint(auth_bp, url_prefix='/')
+    app.register_blueprint(home_bp, url_prefix='/')
     app.register_blueprint(twitter_bp, url_prefix='/x_platform')
 
     app.register_blueprint(twitter_pro_users_bp, url_prefix='/x_platform_pro_users')
 
-    app.register_blueprint(dashboard_bp, url_prefix='/')
+    app.register_blueprint(dashboard_bp, url_prefix='/dashboard')
     app.register_blueprint(api_details_bp, url_prefix='/api_details')
 
     # Add other configurations if needed

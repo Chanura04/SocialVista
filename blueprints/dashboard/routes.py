@@ -1,10 +1,10 @@
 # blueprints/dashboard/routes.py
 
-from flask import Blueprint, render_template, session, current_app
+from flask import Blueprint, render_template, session, current_app, redirect, url_for
 
 dashboard_bp = Blueprint('dashboard', __name__, template_folder='templates', static_folder='static')
 
-@dashboard_bp.route("/")
+@dashboard_bp.route("/dashboard")
 def dashboard():
     if session.get("reset_token") != current_app.config["SESSION_RESET_TOKEN"]:
         session.clear()
@@ -14,4 +14,4 @@ def dashboard():
         user_role = session.get('role', 'user')
         return render_template("dashboard.html", username=session.get('username'), role=user_role)
     else:
-        return render_template("dashboard.html")
+        return  redirect(url_for("auth.login"))

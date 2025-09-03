@@ -1,21 +1,55 @@
 {% extends 'base.html' %}
 
 {% block body %}
+    <div class="dashboard-container">
 
-        <h3>Twitter API Details</h3><br>
-        <p>Screen Name: {{ screen_name }}</p>
-        <p>Twitter API Key: {{ twitter_api_key }}</p><br>
-        <p>Twitter API Secret: {{ twitter_api_secret }}</p><br>
-        <p>Twitter Access Token: {{ user_access_token }}</p><br>
-        <p>Twitter Access Token Secret: {{ user_access_token_secret }}</p><br>
-        <p>Twitter Client ID: {{ client_id }}</p><br>
-        <p>Twitter Client Secret: {{ client_secret }}</p><br>
+       <div class="sidebar">
+               <h2>Social Vista</h2>
+            <nav class="sidebar-nav">
+                <a href="{{ url_for('home.home') }}">🏠 Home</a>
+                <a href="{{ url_for('dashboard.dashboard') }}">🚪 Dashboard</a>
+
+            <p>✨ Select Platform</p>
+            <select name="platform" id="platform" class="sidebar-select" onchange="if(this.value) window.location.href=this.value">
+                <option value="" selected>X</option>
+                <option value="{{ url_for('x_platform.choose_posting_method') }}">🐦 Post to X</option>
+                <option value="{{ url_for('api_details.show_api_credentials') }}">🔑 API Details</option>
+                <option value="{{ url_for('api_details.connect_twitter') }}">🔗 Connect X</option>
+            </select>
+             <select name="platform" id="platform" class="sidebar-select" onchange="if(this.value) window.location.href=this.value">
+                <option value="" selected>Facebook</option>
+                <option value="{{ url_for('x_platform.choose_posting_method') }}">🐦 Post to Facebook</option>
+                <option value="{{ url_for('api_details.show_api_credentials') }}">🔑 API Details</option>
+                <option value="{{ url_for('api_details.connect_twitter') }}">🔗 Connect Facebook</option>
+            </select>
+            <select name="platform" id="platform" class="sidebar-select" onchange="if(this.value) window.location.href=this.value">
+                <option value="" selected>Instagram</option>
+                <option value="{{ url_for('x_platform.choose_posting_method') }}">🐦 Post to Instagram</option>
+                <option value="{{ url_for('api_details.show_api_credentials') }}">🔑 API Details</option>
+                <option value="{{ url_for('api_details.connect_twitter') }}">🔗 Connect Instagram</option>
+            </select>
+                <a href="{{ url_for('auth.logout') }}" class="btn-logout">🚪 Logout</a>
+            </nav>
+      </div>
+
+         <div class="main-content">
+            <div class="container">
+                <h3 class="form_head_topic">Twitter API Details</h3><br>
+                <p>Screen Name: {{ screen_name }}</p>
+                <p>Twitter API Key: {{ twitter_api_key }}</p><br>
+                <p>Twitter API Secret: {{ twitter_api_secret }}</p><br>
+                <p>Twitter Access Token: {{ user_access_token }}</p><br>
+                <p>Twitter Access Token Secret: {{ user_access_token_secret }}</p><br>
+                <p>Twitter Client ID: {{ client_id }}</p><br>
+                <p>Twitter Client Secret: {{ client_secret }}</p><br>
 
 
-    <form method="POST" action="{{ url_for('api_details.reset_api_details') }}">
-            <button >Reset Data</button>
-
-    </form>
+                <form method="POST" action="{{ url_for('api_details.reset_api_details') }}"  id="reset_button-form" >
+                        <button type="button" class="btn btn-rest" >Reset Data</button>
+                </form>
+            </div>
+         </div>
+    </div>
 
 
 {% endblock %}

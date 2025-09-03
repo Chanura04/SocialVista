@@ -2,19 +2,54 @@
 
 {% block body %}
 
+    <div class="dashboard-container">
 
-    <h1>Post Content</h1>
-    <form action="{{url_for('x_platform.instant_post_page')}}" method="POST" id="auth-form">
+       <div class="sidebar">
+               <h2>Social Vista</h2>
+            <nav class="sidebar-nav">
+                <a href="{{ url_for('home.home') }}">🏠 Home</a>
+                <a href="{{ url_for('dashboard.dashboard') }}">🚪 Dashboard</a>
 
-        <textarea name="tweet_content" placeholder="Content" class="input-field" rows="5" cols="20"></textarea><br>
-        <label for="reply_settings_instantPosts">Who can reply to this post?</label>
-        <select name="reply_settings_instantPosts" class="input-field">
-            <option value="mentionedUsers" disabled>Mentioned Users</option>
-            <option value="following">Followings</option>
-            <option value="everyone" selected>Everyone</option>
-        </select>
-        <input type="submit" value="POST"   class="btn btn-login">
-    </form>
+            <p>✨ Select Platform</p>
+            <select name="platform" id="platform" class="sidebar-select" onchange="if(this.value) window.location.href=this.value">
+                <option value="" selected>X</option>
+                <option value="{{ url_for('x_platform.choose_posting_method') }}">🐦 Post to X</option>
+                <option value="{{ url_for('api_details.show_api_credentials') }}">🔑 API Details</option>
+                <option value="{{ url_for('api_details.connect_twitter') }}">🔗 Connect X</option>
+            </select>
+             <select name="platform" id="platform" class="sidebar-select" onchange="if(this.value) window.location.href=this.value">
+                <option value="" selected>Facebook</option>
+                <option value="{{ url_for('x_platform.choose_posting_method') }}">🐦 Post to Facebook</option>
+                <option value="{{ url_for('api_details.show_api_credentials') }}">🔑 API Details</option>
+                <option value="{{ url_for('api_details.connect_twitter') }}">🔗 Connect Facebook</option>
+            </select>
+            <select name="platform" id="platform" class="sidebar-select" onchange="if(this.value) window.location.href=this.value">
+                <option value="" selected>Instagram</option>
+                <option value="{{ url_for('x_platform.choose_posting_method') }}">🐦 Post to Instagram</option>
+                <option value="{{ url_for('api_details.show_api_credentials') }}">🔑 API Details</option>
+                <option value="{{ url_for('api_details.connect_twitter') }}">🔗 Connect Instagram</option>
+            </select>
+                <a href="{{ url_for('auth.logout') }}" class="btn-logout">🚪 Logout</a>
+            </nav>
+      </div>
+
+         <div class="main-content">
+                      <br>
+            <h2 class="form_head_topic">Post Content</h2>
+
+            <form action="{{url_for('x_platform.instant_post_page')}}" method="POST" id="auth-form">
+                <label for="tweet_content">Content:</label>
+                <textarea name="tweet_content" placeholder="Content" class="input-field" rows="5" cols="20"></textarea><br>
+                <label for="reply_settings_instantPosts">Who can reply to this post?</label>
+                <select name="reply_settings_instantPosts" class="sidebar-select">
+                    <option value="mentionedUsers" disabled>Mentioned Users</option>
+                    <option value="following">Followings</option>
+                    <option value="everyone" selected>Everyone</option>
+                </select>
+                <input type="submit" value="POST"   class="btn btn-login">
+            </form>
+         </div>
+    </div>
 
 
 

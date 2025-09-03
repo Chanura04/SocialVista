@@ -1,62 +1,54 @@
 {% extends 'base.html' %}
 
 {% block body %}
-<div class="container">
-    <h1>Welcome , {{username}}</h1>
-    <p>You are logged in</p>
-<!--    <ul>-->
-<!--      {% for tweet in tweets %}-->
-<!--        <li>{{ tweet.text }}</li>-->
-<!--      {% endfor %}-->
-<!--    </ul>-->
 
-<!--    <h1>-&#45;&#45;&#45;&#45;</h1>-->
-<!--    <li>-->
-<!--        {% for tweet in tweets %}-->
-<!--            <strong>{{ tweet.user.screen_name }}</strong>: {{ tweet.text }}-->
-<!--            <br><small>{{ tweet.created_at }}</small>-->
-<!--        {% endfor %}-->
-<!--    </li>-->
+<div class="dashboard-container">
+{% if role == 'user' %}
+    <div class="sidebar">
+        <h2>Social Vista</h2>
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('home.home') }}">🏠 Home</a>
+            <a href="{{ url_for('dashboard.dashboard') }}">🚪 Dashboard</a>
 
-<!--     <h1>-&#45;&#45;&#45;&#45;</h1>-->
-<!--    <ul>-->
-<!--        {% for t in tweets %}-->
-<!--            <li>{{ t.full_text }}</li>-->
-<!--        {% else %}-->
-<!--            <li>No tweets available</li>-->
-<!--        {% endfor %}-->
-<!--    </ul>-->
-    <form action="{{url_for('api_details.connect_twitter')}}" method="GET" id="auth-form_1">
-<!--            <button class="btn btn-login" onclick="window.location.href='{{ url_for('api_details.get_api_details') }}'" >Connect Twitter</button>-->
-            <button class="btn btn-login"  >Connect Twitter</button>
+        <p>✨ Select Platform</p>
+        <select name="platform" id="platform" class="sidebar-select" onchange="if(this.value) window.location.href=this.value">
+            <option value="" selected>X</option>
+            <option value="{{ url_for('x_platform.choose_posting_method') }}">🐦 Post to X</option>
+            <option value="{{ url_for('api_details.show_api_credentials') }}">🔑 API Details</option>
+            <option value="{{ url_for('api_details.connect_twitter') }}">🔗 Connect X</option>
+        </select>
+         <select name="platform" id="platform" class="sidebar-select" onchange="if(this.value) window.location.href=this.value">
+            <option value="" selected>Facebook</option>
+            <option value="{{ url_for('x_platform.choose_posting_method') }}">🐦 Post to Facebook</option>
+            <option value="{{ url_for('api_details.show_api_credentials') }}">🔑 API Details</option>
+            <option value="{{ url_for('api_details.connect_twitter') }}">🔗 Connect Facebook</option>
+        </select>
+        <select name="platform" id="platform" class="sidebar-select" onchange="if(this.value) window.location.href=this.value">
+            <option value="" selected>Instagram</option>
+            <option value="{{ url_for('x_platform.choose_posting_method') }}">🐦 Post to Instagram</option>
+            <option value="{{ url_for('api_details.show_api_credentials') }}">🔑 API Details</option>
+            <option value="{{ url_for('api_details.connect_twitter') }}">🔗 Connect Instagram</option>
+        </select>
+            <a href="{{ url_for('auth.logout') }}" class="btn-logout">🚪 Logout</a>
+        </nav>
+    </div>
 
-    </form><br><br>
 
-    <form action="{{url_for('api_details.show_api_credentials')}}" method="GET" id="auth-form_1">
-            <button class="btn btn-login"  >Show Api Details</button>
-    </form><br><br>
 
-   <form action="{{url_for('x_platform.choose_posting_method')}}" method="GET" id="auth-form_2">
-<!--           <button class="btn btn-post_tweet" onclick="window.location.href='{{ url_for('x_platform.choose_posting_method') }}'">Post Tweet</button>-->
-              <button class="btn btn-post_tweet">Post Tweet</button>
-   </form><br><br>
+    <div class="main-content">
 
-    <form action="{{url_for('auth.login')}}" method="GET" id="auth-form_3">
-<!--           <button class="btn btn-post_tweet" onclick="window.location.href='{{ url_for('x_platform.choose_posting_method') }}'">Post Tweet</button>-->
-              <button class="btn btn-post_tweet">Login</button>
+        <div class="welcome-content">
+            <div class="hero-section">
+                <h1 class="hero-title">Social Vista ✨</h1>
+                {% if username %}
+                    <h3  >Welcome back, {{ username }}! 🎉</h3>
+                {% endif %}
+{#                <p class="hero-subtitle">Ready to conquer social media? Your dashboard is your command center for managing and scheduling all your Twitter posts.</p>#}
+            </div>
+        </div>
 
-   </form><br><br>
-
-    <form action="{{url_for('auth.signup')}}" method="GET" id="auth-form_4">
-<!--           <button class="btn btn-post_tweet" onclick="window.location.href='{{ url_for('x_platform.choose_posting_method') }}'">Post Tweet</button>-->
-              <button class="btn btn-post_tweet">SignUp</button>
-   </form><br><br>
-
-{% if role == 'admin' %}
-    <a href="/login" class="btn btn-logout">Logout</a>
+    </div>
 {% endif %}
 </div>
-
-
 
 {% endblock %}

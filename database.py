@@ -112,6 +112,15 @@ def store_future_cast_data(email,context,Need_to_Publish,Platform_Name,Created_o
     cursor.close()
     UserData_conn.close()
 
+
+def store_future_cast_Media_data(email,context,Need_to_Publish,Platform_Name,file_name,file_type,Created_on,Status):
+    UserData_conn = get_pg_connection()
+    cursor = UserData_conn.cursor()
+    cursor.execute("INSERT INTO FutureCastMediaData (Email,Context,Need_to_Publish,Platform_Name,file_name,file_type,Created_on,,Created_on,Status) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",(email,context,Need_to_Publish,Platform_Name,file_name,file_type,Created_on,Status))
+    UserData_conn.commit()
+    cursor.close()
+    UserData_conn.close()
+
 def store_instant_cast_data(email,context,Platform_Name,Created_on,Status):
     UserData_conn = get_pg_connection()
     cursor = UserData_conn.cursor()
