@@ -242,40 +242,10 @@ def add_X_api_details(email,encrypted_twitter_api_key,
     UserData_conn.commit()
 
 def reset_api_details_db(email):
-    # client_id = None
-    # client_secret = None
-    # twitter_access_token = None
-    # twitter_access_token_secret = None
-    # twitter_api_key = None
-    # twitter_api_secret = None
-    # screen_name = None
-    # isFilledApiDetails = False
-    # canPost = False
 
     UserData_conn = get_pg_connection()
     cursor = UserData_conn.cursor()
-    # cursor.execute("""
-    #                UPDATE x_api_details
-    #                SET twitter_api_key             = %s,
-    #                    twitter_api_secret          = %s,
-    #                    twitter_access_token        = %s,
-    #                    twitter_access_token_secret = %s,
-    #                    client_id                   = %s,
-    #                    client_secret               = %s,
-    #                    screen_name                 = %s,
-    #                    isFilledApiDetails           = %s,
-    #                    canPost                      = %s
-    #                WHERE email = %s""",
-    #                (twitter_api_key,
-    #                 twitter_api_secret,
-    #                 twitter_access_token,
-    #                 twitter_access_token_secret,
-    #                 client_id,
-    #                 client_secret,
-    #                 screen_name,
-    #                 isFilledApiDetails,
-    #                 canPost,
-    #                 email))
+
     cursor.execute("""DELETE FROM x_api_details WHERE email = %s""", (email,))
     logging.info("reset_api_details")
     cursor.close()

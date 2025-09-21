@@ -254,7 +254,7 @@ def post_instant_media_task(
                 store_instant_media_files(
                     email,
                     tweet_text,
-                    file_content.filename,
+                    f"{media_id}.{file_extension}",
                     file_content.content_type,
                     created_on,
                     "Success"
@@ -278,7 +278,7 @@ def post_instant_media_task(
                 store_instant_media_files(
                     email,
                     tweet_text,
-                    file_content.filename,
+                    f".{file_extension}",
                     file_content.content_type,
                     created_on,
                     f"Failed: {str(e)}"
@@ -389,7 +389,7 @@ def post_future_media_task(self,email,need_to_publish,tweet_text,file_extension,
                 store_future_cast_Media_data(
                     email,
                     tweet_text,need_to_publish, platform_name,
-                    file_content.filename,
+                    f"{media_id}.{file_extension}",
                     file_content.content_type,
                     created_on,
                     "Success"
@@ -414,7 +414,7 @@ def post_future_media_task(self,email,need_to_publish,tweet_text,file_extension,
                 store_future_cast_Media_data(
                     email,
                     tweet_text, need_to_publish, platform_name,
-                    file_content.filename,
+                    f".{file_extension}",
                     file_content.content_type,
                     created_on,
                     f"Failed: {str(e)}"

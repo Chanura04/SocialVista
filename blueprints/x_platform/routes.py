@@ -21,12 +21,6 @@ def instant_post_page():
         if session.get("email"):
             if get_is_filled_api_details(session['email']):
                 if check_user_exists(session['email']) and check_canPost():
-                    # UserData_conn = get_pg_connection()
-                    # cursor = UserData_conn.cursor()
-                    # cursor.execute(
-                    #     "SELECT twitter_api_key,twitter_api_secret,twitter_access_token,twitter_access_token_secret,client_id,client_secret,screen_name FROM UserData WHERE Email = %s",
-                    #     (session['email'],))
-                    # result = cursor.fetchone()
                     result = get_api_details(session['email'])
 
                     twitter_api_key = result[0]
@@ -64,7 +58,7 @@ def instant_post_page():
                             decrypt_twitter_user_access_token_secret
                         )
 
-                        return redirect(url_for("x_platform.instant_post_page"))
+                        return render_template("send_instant_post.html",status='Successfully posted!🎉🎉')
                     else:
                         flash("⚠️ Please fill the required fields!")
                         return redirect(url_for("x_platform.instant_post_page"))
@@ -79,7 +73,7 @@ def instant_post_page():
     if request.method == "GET":
         if session.get("email"):
             if get_is_filled_api_details(session['email']):
-                return render_template("send_instant_post.html")
+                return render_template("send_instant_post.html",status='')
             else:
                 return redirect(url_for("api_details.connect_twitter"))
         else:
@@ -87,93 +81,7 @@ def instant_post_page():
 
     return render_template("send_instant_post.html")
 
-# @twitter_bp.route("/connect_twitter", methods=["POST","GET"])
-# def connect_twitter():
-#     if request.method == "POST":
-#         if session.get("email"):
-#             if check_user_exists(session['email']):
-#                 twitter_api_key = request.form.get("api_key")
-#                 twitter_api_secret = request.form.get("api_secret")
-#                 twitter_access_token = request.form.get("access_token")
-#                 twitter_access_token_secret = request.form.get("access_token_secret")
-#                 screen_name = request.form.get("screen_name")
-#                 client_id = request.form.get("client_id")
-#                 client_secret = request.form.get("client_secret")
-#                 isFilledApiDetails=True
-#                 canPost=True
-#
-#
-#                 # Get the key from DB (stored as string)
-#                 fernet_key_str = get_current_user_fernet_key() # make sure it's bytes thats why we encode that
-#
-#                 # Convert back to bytes before using Fernet
-#                 fernet_key_bytes = fernet_key_str.encode()
-#
-#                 api_key_handler_obj = APIKeyHandler(fernet_key=fernet_key_bytes)
-#
-#                 encrypted_twitter_api_key=api_key_handler_obj.encrypt_key(twitter_api_key)
-#                 encrypted_twitter_api_secret=api_key_handler_obj.encrypt_key(twitter_api_secret)
-#                 encrypted_twitter_access_token=api_key_handler_obj.encrypt_key(twitter_access_token)
-#                 encrypted_twitter_access_token_secret=api_key_handler_obj.encrypt_key(twitter_access_token_secret)
-#                 encrypted_client_id=api_key_handler_obj.encrypt_key(client_id)
-#                 encrypted_client_secret=api_key_handler_obj.encrypt_key(client_secret)
-#                 encrypted_screen_name=api_key_handler_obj.encrypt_key(screen_name)
-#
-#                 # UserData_conn = get_pg_connection()
-#                 # cursor = UserData_conn.cursor()
-#                 # cursor.execute(
-#                 #         """
-#                 #                    UPDATE UserData
-#                 #                    SET  twitter_api_key = %s,twitter_api_secret = %s,twitter_access_token = %s,twitter_access_token_secret = %s,
-#                 #                         client_id = %s,client_secret = %s ,screen_name = %s
-#                 #                    WHERE Email = %s
-#                 #                 """,
-#                 #                    (
-#                 #                             encrypted_twitter_api_key,
-#                 #                             encrypted_twitter_api_secret,
-#                 #                             encrypted_twitter_access_token,
-#                 #                             encrypted_twitter_access_token_secret,
-#                 #                             encrypted_client_id,
-#                 #                             encrypted_client_secret,
-#                 #                             encrypted_screen_name,
-#                 #                             session['email'])
-#                 #                     )
-#                 # cursor.close()
-#                 # UserData_conn.commit()
-#                 add_X_api_details(encrypted_twitter_api_key,
-#                                             encrypted_twitter_api_secret,
-#                                             encrypted_twitter_access_token,
-#                                             encrypted_twitter_access_token_secret,
-#                                             encrypted_client_id,
-#                                             encrypted_client_secret,
-#                                             encrypted_screen_name,
-#                                             session['email'])
-#
-#                 # UserData_conn = get_pg_connection()
-#                 # cursor = UserData_conn.cursor()
-#                 # cursor.execute("""
-#                 #                         UPDATE UserData
-#                 #                         SET isFilledApiDetails = %s , canPost = %s
-#                 #                         WHERE Email = %s
-#                 #                       """,(isFilledApiDetails,canPost,session['email']))
-#                 # cursor.close()
-#                 # UserData_conn.commit()
-#                 update_api_details_staus(isFilledApiDetails,canPost,session['email'])
-#
-#                 return render_template("dashboard.html" )
-#             else:
-#                 session['canPost'] = False
-#                 return redirect(url_for("dashboard.dashboard"))
-#         else:
-#             return redirect(url_for("auth.login"))
-#     if request.method == "GET":
-#         if session.get("email"):
-#             if check_user_exists(session['email']):
-#                     redirect(url_for("api_details.get_api_details"))
-#         else:
-#             return redirect(url_for("auth.login"))
-#
-#     return redirect(url_for("api_details.get_api_details"))
+
 
 @twitter_bp.route("/choose_posting_method", methods=["GET"])
 def choose_posting_method():
@@ -191,12 +99,7 @@ def future_post_page():
         if session.get("email"):
             if check_api_details():
                 if check_user_exists(session['email']) and check_canPost():
-                    # UserData_conn = get_pg_connection()
-                    # cursor = UserData_conn.cursor()
-                    # cursor.execute(
-                    #     "SELECT twitter_api_key,twitter_api_secret,twitter_access_token,twitter_access_token_secret,client_id,client_secret,screen_name FROM UserData WHERE Email = %s",
-                    #     (session['email'],))
-                    # result = cursor.fetchone()
+
                     result = get_api_details(session['email'])
 
 
@@ -276,6 +179,5 @@ def future_post_page():
         else:
             return redirect(url_for("auth.login"))
 
-        # After POST (success or fail), always return something
-    # return redirect(url_for("auth.login"))
+
     return render_template("create_post_scheduler.html")

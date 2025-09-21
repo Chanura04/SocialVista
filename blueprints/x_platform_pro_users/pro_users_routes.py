@@ -2,6 +2,7 @@
 
 from flask import Blueprint, request, session, flash, redirect, url_for, render_template
 import supabase
+
 from werkzeug.utils import secure_filename
 from database import check_user_exists, check_api_details, check_canPost, get_pg_connection, \
     update_accountUpdatedOn_column, store_instant_media_files, get_api_details, get_is_filled_api_details
@@ -26,7 +27,7 @@ def post_instant_media_files():
         if not get_is_filled_api_details(session['email']):
             return redirect(url_for("api_details.connect_twitter"))
 
-        return render_template("post_medias_f_pro_users.html")
+        return render_template("post_medias_f_pro_users.html",status='')
 
     # POST method handling
     if request.method == "POST":
@@ -54,7 +55,7 @@ def post_instant_media_files():
 
         if not media_file or media_file.filename == '':
             flash("⚠️ Please select a media file!")
-            return redirect(url_for("x_platform_pro_users.post_instant_media_files"))
+            return render_template("post_medias_f_pro_users.html", status='️⚠️  Please select a media file!')
 
         # Validate file type
         allowed_extensions = {'png', 'jpg', 'jpeg', 'gif', 'webp', 'mp4', 'mov', 'avi'}
@@ -62,18 +63,10 @@ def post_instant_media_files():
 
         if file_extension not in allowed_extensions:
             flash(f"⚠️ Unsupported file type: {file_extension}")
-            return redirect(url_for("x_platform_pro_users.post_instant_media_files"))
+            return render_template("post_medias_f_pro_users.html", status='⚠️ Unsupported file type!')
 
         try:
-            # Get encrypted API credentials from database
-            # UserData_conn = get_pg_connection()
-            # cursor = UserData_conn.cursor()
-            # cursor.execute(
-            #     "SELECT twitter_api_key,twitter_api_secret,twitter_access_token,twitter_access_token_secret FROM UserData WHERE Email = %s",
-            #     (session['email'],))
-            # result = cursor.fetchone()
-            # cursor.close()
-            # UserData_conn.close()
+
             result=get_api_details(session['email'])
 
             if not result:
@@ -107,7 +100,7 @@ def post_instant_media_files():
             print(e)
 
 
-        return redirect(url_for("x_platform_pro_users.post_instant_media_files"))
+        return render_template("post_medias_f_pro_users.html",status='Successfully posted!🎉🎉')
 
 
 
@@ -122,7 +115,7 @@ def post_futureCast_medias_f_pro_users():
         if not get_is_filled_api_details(session['email']):
             return redirect(url_for("api_details.connect_twitter"))
 
-        return render_template("post_futureCast_medias_f_pro_users.html")
+        return render_template("post_futureCast_medias_f_pro_users.html",status='')
 
     # POST method handling
     if request.method == "POST":
@@ -167,17 +160,7 @@ def post_futureCast_medias_f_pro_users():
             return redirect(url_for("x_platform_pro_users.post_futureCast_medias_f_pro_users"))
 
         try:
-            # Get encrypted API credentials from database
-            # UserData_conn = get_pg_connection()
-            # cursor = UserData_conn.cursor()
-            # cursor.execute(
-            #     "SELECT twitter_api_key,twitter_api_secret,twitter_access_token,twitter_access_token_secret FROM UserData WHERE Email = %s",
-            #     (session['email'],))
-            # result = cursor.fetchone()
-            # cursor.close()
-            # UserData_conn.close()
 
-            # The format string should match how the date is stored in DB
             sri_lanka_tz = ZoneInfo("Asia/Colombo")
 
             local_time = datetime.now(sri_lanka_tz)
@@ -216,7 +199,7 @@ def post_futureCast_medias_f_pro_users():
                     print(f"form data time: {need_to_publish}")
                     print(f"converted data time: {future_post_data_time}")
 
-                    return redirect(url_for("x_platform_pro_users.post_futureCast_medias_f_pro_users"))
+                    return render_template("post_futureCast_medias_f_pro_users.html", status='Successfully posted!🎉🎉 ')
                 except Exception as e:
 
                     print(f"Error scheduling tweet: {e}")

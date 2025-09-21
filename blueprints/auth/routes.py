@@ -210,14 +210,6 @@ def verify_email():
 
                 referralCode = str(uuid.uuid4())
 
-                # UserData_conn = get_pg_connection()
-                # cursor = UserData_conn.cursor()
-                # cursor.execute("""
-                #                INSERT INTO UserData (FirstName, LastName, Email, Password, Fernet_key)
-                #                VALUES (%s, %s, %s, %s, %s)
-                #                """, (first_name, last_name, email, encrypt_password, fernet_key_str,))
-                # cursor.close()
-                # UserData_conn.commit()
                 add_new_user(first_name, last_name, email, encrypt_password, fernet_key_str,referralCode,account_status)
                 update_accountCreatedOn_column(email)
 
@@ -229,22 +221,6 @@ def verify_email():
                     print(check_is_pro_user)
                     if check_is_pro_user:
                         update_user_role(referral_code_owner,"pro_user")
-
-                #
-                # UserData_conn = get_pg_connection()
-                # cursor = UserData_conn.cursor()
-                # cursor.execute("""
-                #                UPDATE UserData
-                #                SET signup_status= %s,
-                #                    account_status= %s
-                #                WHERE Email = %s
-                #
-                #
-                #                """, (True, True, email))
-                # cursor.close()
-                # UserData_conn.commit()
-
-
 
                 print("📌 DEBUG Signup values:", first_name, last_name, email, password)
 
