@@ -12,6 +12,8 @@ from blueprints.dashboard.routes import dashboard_bp
 from blueprints.api_details.routes import api_details_bp
 from blueprints.x_platform_pro_users import twitter_pro_users_bp
 from blueprints.home import home_bp
+from blueprints.premium_interface import premium_interface_bp
+from blueprints.coming_soon import coming_soon_bp
 load_dotenv()
 
 # We can put some functions from app.py here as they are general purpose
@@ -32,6 +34,9 @@ def create_app():
 
     app.register_blueprint(dashboard_bp, url_prefix='/dashboard')
     app.register_blueprint(api_details_bp, url_prefix='/api_details')
+    app.register_blueprint(coming_soon_bp, url_prefix='/coming_soon')
+    app.register_blueprint(premium_interface_bp, url_prefix='/premium_interface')
+
 
     # Add other configurations if needed
     app.config["SESSION_RESET_TOKEN"] = str(uuid.uuid4())

@@ -4,7 +4,7 @@ from flask import Blueprint, request, session, flash, redirect, url_for, render_
 import supabase
 from werkzeug.utils import secure_filename
 from database import check_user_exists, check_api_details, check_canPost, get_pg_connection, \
-    update_accountUpdatedOn_column,store_instant_media_files,get_api_details
+    update_accountUpdatedOn_column, store_instant_media_files, get_api_details, get_is_filled_api_details
 from helpers import APIKeyHandler, get_current_user_fernet_key
 from datetime import datetime
 from celery_worker import post_instant_media_task,post_future_media_task
@@ -23,8 +23,8 @@ def post_instant_media_files():
         if not session.get("email"):
             return redirect(url_for("auth.login"))
 
-        if not check_api_details():
-            return redirect(url_for("x_platform.connect_twitter"))
+        if not get_is_filled_api_details(session['email']):
+            return redirect(url_for("api_details.connect_twitter"))
 
         return render_template("post_medias_f_pro_users.html")
 
@@ -35,9 +35,9 @@ def post_instant_media_files():
             flash("⚠️ Please log in first!")
             return redirect(url_for("auth.login"))
 
-        if not check_api_details():
+        if not get_is_filled_api_details(session['email']):
             flash("⚠️ Please configure your API details first!")
-            return redirect(url_for("x_platform.connect_twitter"))
+            return redirect(url_for("api_details.connect_twitter"))
 
         if not (check_user_exists(session['email']) and check_canPost()):
             flash("⚠️ You don't have permission to post!")
@@ -78,7 +78,7 @@ def post_instant_media_files():
 
             if not result:
                 flash("⚠️ No API credentials found!")
-                return redirect(url_for("x_platform.connect_twitter"))
+                return redirect(url_for("api_details.connect_twitter"))
 
             # Decrypt API credentials
             fernet_key_str = get_current_user_fernet_key()
@@ -119,8 +119,8 @@ def post_futureCast_medias_f_pro_users():
         if not session.get("email"):
             return redirect(url_for("auth.login"))
 
-        if not check_api_details():
-            return redirect(url_for("x_platform.connect_twitter"))
+        if not get_is_filled_api_details(session['email']):
+            return redirect(url_for("api_details.connect_twitter"))
 
         return render_template("post_futureCast_medias_f_pro_users.html")
 
@@ -131,9 +131,9 @@ def post_futureCast_medias_f_pro_users():
             flash("⚠️ Please log in first!")
             return redirect(url_for("auth.login"))
 
-        if not check_api_details():
+        if not get_is_filled_api_details(session['email']):
             flash("⚠️ Please configure your API details first!")
-            return redirect(url_for("x_platform.connect_twitter"))
+            return redirect(url_for("api_details.connect_twitter"))
 
         if not (check_user_exists(session['email']) and check_canPost()):
             flash("⚠️ You don't have permission to post!")
@@ -189,7 +189,7 @@ def post_futureCast_medias_f_pro_users():
 
             if not result:
                 flash("⚠️ No API credentials found!")
-                return redirect(url_for("x_platform.connect_twitter"))
+                return redirect(url_for("api_details.connect_twitter"))
 
             # Decrypt API credentials
             fernet_key_str = get_current_user_fernet_key()

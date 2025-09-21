@@ -6,8 +6,10 @@
        <div class="sidebar">
                <h2>Social Vista</h2>
             <nav class="sidebar-nav">
-                <a href="{{ url_for('home.home') }}">🏠 Home</a>
+
                 <a href="{{ url_for('dashboard.dashboard') }}">🚪 Dashboard</a>
+                <a href="{{ url_for('premium_interface.premium_interface') }}">💎 Premium</a>
+
 
             <p>✨ Select Platform</p>
             <select name="platform" id="platform" class="sidebar-select" onchange="if(this.value) window.location.href=this.value">
@@ -32,23 +34,19 @@
             </nav>
       </div>
 
-  {% else %}
-    <div class="sidebar">
-            <h2>Social Vista</h2>
-            <nav class="sidebar-nav">
-                <a href="{{ url_for('home.home') }}">🏠 Home</a>
-                <a href="{{ url_for('auth.login') }}">🚪 Dashboard</a>
 
-            </nav>
-    </div>
 
   {% endif %}
 
-    <div class="main-content">
+    <div class="container">
         <div class="welcome-content">
             <div class="hero-section">
                 <h1 class="hero-title">Social Vista ✨</h1>
-                <p class="hero-subtitle">Your all-in-one platform for managing and scheduling social media posts. Say goodbye to the hassle of logging into multiple accounts—streamline your workflow and focus on creating amazing content!</p>
+                <p class="hero-subtitle">Your all-in-one platform for managing and scheduling social media posts. Say goodbye to the hassle of logging into multiple accounts—streamline your workflow and focus on creating amazing content!
+                </p><br>
+              <a href="{{ url_for('auth.login') }}" class="btn btn-primary">Get Started</a>
+
+
             </div>
 
             <div class="feature-grid">
@@ -114,7 +112,7 @@
             </div>
 
             <div class="how-it-works">
-                <h2 class="section-title">How It Works ⚙️</h2>
+                <h2 class="section-title">How This Works ⚙️</h2>
                 <div class="steps-container">
                     <div class="step-item">
                         <div class="step-number">1</div>
@@ -148,7 +146,7 @@
                     <p class="hero-subtitle">Join thousands of content creators who trust Social Vista to manage their social media presence. Start your journey today!</p>
                     <div class="cta-buttons">
                         <a href="{{ url_for('auth.login') }}" class="btn btn-primary">🚀 Get Started - Login</a>
-                        <a href="{{ url_for('auth.signup') }}" class="btn btn-secondary">✨ Create Account</a>
+                        <a href="{{ url_for('auth.signup') }}" class="btn btn-primary">✨ Create Account</a>
                     </div>
                 </div>
             </div>

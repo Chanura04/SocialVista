@@ -1,21 +1,27 @@
 # blueprints/auth/routes.py
-
+import os
+import random
+import string
+import time
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+import smtplib
+import uuid
+import logging
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 # Import your database and helper functions from a common module
-from database import get_pg_connection, get_user_password, get_user_first_name, check_user_exists, \
-    update_accountUpdatedOn_column, update_accountCreatedOn_column,get_user_role
+from database import (add_new_user, get_user_password, get_user_first_name, check_user_exists, \
+    update_accountUpdatedOn_column, update_accountCreatedOn_column,get_user_role,get_referral_code_owner,
+                      add_referral_code_used_users,track_referralCode,update_user_role)
+
 from helpers import Password
 from cryptography.fernet import Fernet
+from datetime import datetime, timedelta
+from dotenv import load_dotenv
+load_dotenv()
 auth_bp = Blueprint('auth', __name__, template_folder='templates', static_folder='static')
 
-# class Password:
-#     def set_password(self,password):
-#         self.password = generate_password_hash(password)
-#         return self.password
-#
-#     def check_password(self,hashed_password, plain_password):
-#         return check_password_hash(hashed_password, plain_password)
 
 @auth_bp.route("/login", methods=["POST", "GET"])
 def login():
@@ -31,6 +37,7 @@ def login():
         exists = check_user_exists(email)
 
         user_db_stored_password = get_user_password(email)
+        print(user_db_stored_password)
         pass_ob=Password()
 
 
@@ -67,44 +74,100 @@ def signup():
                     return render_template("login.html", error="username already exists here!")
 
                 else:
+                    promo_code=request.form.get("promo_code")
+                    if promo_code:
+                        check_promo_code=get_referral_code_owner(promo_code)
+                        print("owner is ",check_promo_code)
+                        if check_promo_code:
 
-                    first_name = request.form.get("first_name")
-                    last_name = request.form.get("last_name")
-                    email = request.form.get("email")
-                    password = request.form.get("password")
-                    print("📌 DEBUG Signup values:", first_name, last_name, email, password)
+                            first_name = request.form.get("first_name")
+                            last_name = request.form.get("last_name")
+                            email = request.form.get("email")
+                            password = request.form.get("password")
+                            print("📌 DEBUG Signup values:", first_name, last_name, email, password)
 
-                    pass_obj = Password()
-                    encrypt_password = pass_obj.set_password(password)
+                            session['signup_first_name'] = first_name
+                            session['signup_last_name'] = last_name
+                            session['signup_email'] = email
+                            session['signup_password'] = password
+                            session['referralCode'] = promo_code
+                            print(session['referralCode'])
 
-                    fernet_key = Fernet.generate_key()
-                    fernet_key_str = fernet_key.decode()
+                            otp = ''.join(random.choices(string.digits, k=6))
+                            session['otp'] = otp
+                            print("OTP:", otp)
 
-                    UserData_conn = get_pg_connection()
-                    cursor = UserData_conn.cursor()
-                    cursor.execute("""
-                                   INSERT INTO UserData (FirstName, LastName, Email, Password, Fernet_key)
-                                   VALUES (%s, %s, %s, %s, %s)
-                                   """, (first_name, last_name, email, encrypt_password, fernet_key_str,))
-                    cursor.close()
-                    UserData_conn.commit()
-                    update_accountCreatedOn_column(email)
+                            otp_expiry = datetime.now() + timedelta(seconds=50)
+                            sender_email = "chanurakarunanayake12@gmail.com"
+                            app_password = os.getenv("GMAIL_APP_PASSWORD")
 
-                    UserData_conn = get_pg_connection()
-                    cursor = UserData_conn.cursor()
-                    cursor.execute("""
-                                   UPDATE UserData
-                                   SET signup_status= %s,
-                                       account_status= %s
-                                   WHERE Email = %s
+                            # Build email
+                            message = MIMEMultipart()
+                            message["From"] = sender_email
+                            message["To"] = session.get('signup_email')
+                            message["Subject"] = "Your OTP Code"
+
+                            # body = f"Your verification code is: {otp}"
+                            # message.attach(MIMEText(body, "plain"))
+                            body = f"Your verification code is: {otp}"
+                            message.attach(MIMEText(body, "plain"))
+
+                            try:
+                                with smtplib.SMTP("smtp.gmail.com", 587) as server:
+                                    server.starttls()
+                                    server.login(sender_email, app_password)
+                                    server.sendmail(sender_email, session.get('signup_email'), message.as_string())
+                                    session["otp_sent_message"] = True
+                                    return redirect(url_for("auth.verify_email"))
+
+                            except Exception as e:
+                                logging.error(f"Error sending OTP: {e}")
+                        else:
+                            return render_template("signup.html",error="Invalid Promo Code...Please try again!")
+                    else:
+                        first_name = request.form.get("first_name")
+                        last_name = request.form.get("last_name")
+                        email = request.form.get("email")
+                        password = request.form.get("password")
+                        print("📌 DEBUG Signup values:", first_name, last_name, email, password)
+
+                        session['signup_first_name'] = first_name
+                        session['signup_last_name'] = last_name
+                        session['signup_email'] = email
+                        session['signup_password'] = password
+                        session['referralCode'] = False
+
+                        otp = ''.join(random.choices(string.digits, k=6))
+                        session['otp'] = otp
+                        print("OTP:", otp)
+
+                        otp_expiry = datetime.now() + timedelta(seconds=50)
+                        sender_email = "chanurakarunanayake12@gmail.com"
+                        app_password = os.getenv("GMAIL_APP_PASSWORD")
+
+                        # Build email
+                        message = MIMEMultipart()
+                        message["From"] = sender_email
+                        message["To"] = session.get('signup_email')
+                        message["Subject"] = "Your OTP Code"
+
+                        # body = f"Your verification code is: {otp}"
+                        # message.attach(MIMEText(body, "plain"))
+                        body = f"Your verification code is: {otp}"
+                        message.attach(MIMEText(body, "plain"))
+
+                        try:
+                            with smtplib.SMTP("smtp.gmail.com", 587) as server:
+                                server.starttls()
+                                server.login(sender_email, app_password)
+                                server.sendmail(sender_email, session.get('signup_email'), message.as_string())
+                                session["otp_sent_message"] = True
+                                return redirect(url_for("auth.verify_email"))
+
+                        except Exception as e:
+                            logging.error(f"Error sending OTP: {e}")
 
 
-                                   """, (True, True, email))
-                    cursor.close()
-                    UserData_conn.commit()
-
-                    session["username"] = first_name
-                    return redirect(url_for("auth.login"))
             except Exception as e:
                 print(e)
 
@@ -113,12 +176,87 @@ def signup():
     return render_template("signup.html")
 
 
-@auth_bp.route("/logout", methods=["POST"])
+@auth_bp.route("/logout")
 def logout():
-    if request.method == "POST":
+
         session.pop("username", None)
         session.pop("email", None)
         session.pop("toDashboard", False)
         session.clear()
         return redirect(url_for("auth.login"))
-    return redirect(url_for("dashboard.dashboard"))
+
+@auth_bp.route("/verify_email", methods=["POST", "GET"])
+def verify_email():
+    if request.method == "GET":
+        return render_template("verify_email.html")
+    if request.method == "POST":
+        otp_password = request.form.get("otp_password")
+        if session.get("otp_sent_message"):
+            if otp_password==session.get('otp'):
+                session['otp'] = None
+
+                first_name = session.get('signup_first_name')
+                last_name = session.get('signup_last_name')
+                email = session.get('signup_email')
+                password = session.get('signup_password')
+
+                pass_obj = Password()
+                encrypt_password = pass_obj.set_password(password)
+
+                fernet_key = Fernet.generate_key()
+                fernet_key_str = fernet_key.decode()
+
+                account_status=True
+
+                referralCode = str(uuid.uuid4())
+
+                # UserData_conn = get_pg_connection()
+                # cursor = UserData_conn.cursor()
+                # cursor.execute("""
+                #                INSERT INTO UserData (FirstName, LastName, Email, Password, Fernet_key)
+                #                VALUES (%s, %s, %s, %s, %s)
+                #                """, (first_name, last_name, email, encrypt_password, fernet_key_str,))
+                # cursor.close()
+                # UserData_conn.commit()
+                add_new_user(first_name, last_name, email, encrypt_password, fernet_key_str,referralCode,account_status)
+                update_accountCreatedOn_column(email)
+
+                if session.get('referralCode'):
+                    referral_code_owner=get_referral_code_owner(session.get('referralCode'))
+                    add_referral_code_used_users(referral_code_owner,session.get('signup_email'),session.get('referralCode'))
+
+                    check_is_pro_user=track_referralCode(referral_code_owner)
+                    print(check_is_pro_user)
+                    if check_is_pro_user:
+                        update_user_role(referral_code_owner,"pro_user")
+
+                #
+                # UserData_conn = get_pg_connection()
+                # cursor = UserData_conn.cursor()
+                # cursor.execute("""
+                #                UPDATE UserData
+                #                SET signup_status= %s,
+                #                    account_status= %s
+                #                WHERE Email = %s
+                #
+                #
+                #                """, (True, True, email))
+                # cursor.close()
+                # UserData_conn.commit()
+
+
+
+                print("📌 DEBUG Signup values:", first_name, last_name, email, password)
+
+
+                session["username"] = first_name
+                return redirect(url_for("auth.login"))
+
+            else:
+                session['otp'] = None
+                return render_template("verify_email.html", error="Invalid OTP...Please try again!")
+        else:
+            return redirect(url_for("auth.signup"))
+
+
+

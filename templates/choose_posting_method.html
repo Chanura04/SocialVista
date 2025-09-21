@@ -3,52 +3,69 @@
 {% block body %}
     <div class="dashboard-container">
 
-       <div class="sidebar">
-               <h2>Social Vista</h2>
-            <nav class="sidebar-nav">
-                <a href="{{ url_for('home.home') }}">🏠 Home</a>
-                <a href="{{ url_for('dashboard.dashboard') }}">🚪 Dashboard</a>
+        <div class="sidebar">
+                   <h2>Social Vista</h2>
+                <nav class="sidebar-nav">
 
-            <p>✨ Select Platform</p>
-            <select name="platform" id="platform" class="sidebar-select" onchange="if(this.value) window.location.href=this.value">
-                <option value="" selected>X</option>
-                <option value="{{ url_for('x_platform.choose_posting_method') }}">🐦 Post to X</option>
-                <option value="{{ url_for('api_details.show_api_credentials') }}">🔑 API Details</option>
-                <option value="{{ url_for('api_details.connect_twitter') }}">🔗 Connect X</option>
-            </select>
-             <select name="platform" id="platform" class="sidebar-select" onchange="if(this.value) window.location.href=this.value">
-                <option value="" selected>Facebook</option>
-                <option value="{{ url_for('x_platform.choose_posting_method') }}">🐦 Post to Facebook</option>
-                <option value="{{ url_for('api_details.show_api_credentials') }}">🔑 API Details</option>
-                <option value="{{ url_for('api_details.connect_twitter') }}">🔗 Connect Facebook</option>
-            </select>
-            <select name="platform" id="platform" class="sidebar-select" onchange="if(this.value) window.location.href=this.value">
-                <option value="" selected>Instagram</option>
-                <option value="{{ url_for('x_platform.choose_posting_method') }}">🐦 Post to Instagram</option>
-                <option value="{{ url_for('api_details.show_api_credentials') }}">🔑 API Details</option>
-                <option value="{{ url_for('api_details.connect_twitter') }}">🔗 Connect Instagram</option>
-            </select>
-                <a href="{{ url_for('auth.logout') }}" class="btn-logout">🚪 Logout</a>
-            </nav>
-      </div>
-
-         <div class="main-content">
-            <form action="{{ url_for('x_platform.instant_post_page') }}" method="GET" class="form-method_chooser">
-                <button  type="submit" name="method">Instant Post</button>
-            </form>
-
-            <form action="{{ url_for('x_platform.future_post_page') }}" method="GET" class="form-method_chooser">
-                <button type="submit" name="method" >FutureCast</button>
-            </form>
+                    <a href="{{ url_for('dashboard.dashboard') }}">🚪 Dashboard</a>
+                    <a href="{{ url_for('premium_interface.premium_interface') }}">💎 Premium</a>
 
 
-            <form action="{{ url_for('x_platform_pro_users.post_instant_media_files') }}" method="GET" class="form-method_chooser">
-                <button type="submit" name="method" >Post Instant Medias</button>
-            </form>
-             <form action="{{ url_for('x_platform_pro_users.post_futureCast_medias_f_pro_users') }}" method="GET" class="form-method_chooser">
-                <button type="submit" name="method" >Post FutureCast Medias</button>
-            </form>
+                <p>✨ Select Platform</p>
+                <select name="platform" id="platform" class="sidebar-select" onchange="if(this.value) window.location.href=this.value">
+                    <option value="" selected>X</option>
+                    <option value="{{ url_for('x_platform.choose_posting_method') }}">🐦 Post to X</option>
+                    <option value="{{ url_for('api_details.show_api_credentials') }}">🔑 API Details</option>
+                    <option value="{{ url_for('api_details.connect_twitter') }}">🔗 Connect X</option>
+                </select>
+                 <select name="platform" id="platform" class="sidebar-select" onchange="if(this.value) window.location.href=this.value">
+                    <option value="" selected>Facebook</option>
+                    <option value="{{ url_for('coming_soon.coming_soon') }}">🐦 Post to Facebook</option>
+                    <option value="{{ url_for('coming_soon.coming_soon') }}">🔑 API Details</option>
+                    <option value="{{ url_for('coming_soon.coming_soon') }}">🔗 Connect Facebook</option>
+                </select>
+                <select name="platform" id="platform" class="sidebar-select" onchange="if(this.value) window.location.href=this.value">
+                    <option value="" selected>Instagram</option>
+                    <option value="{{ url_for('coming_soon.coming_soon') }}">🐦 Post to Instagram</option>
+                    <option value="{{ url_for('coming_soon.coming_soon') }}">🔑 API Details</option>
+                    <option value="{{ url_for('coming_soon.coming_soon') }}">🔗 Connect Instagram</option>
+                </select>
+                     <a href="{{ url_for('auth.logout') }}" class="btn-logout">🚪 Logout</a><br><br>
+                    {% if role == 'pro_user' %}👑 Premium User{% endif %}
+                </nav>
+          </div>
+<br>
+      <div class="main-content">
+          <h1 style="text-align: center" >🚀 Smart Posting Starts Here 🚀</h1><br><br>
+
+         <div class="feature-grid">
+
+               <a onclick="window.location.href='{{ url_for('x_platform.instant_post_page') }}'" >
+                 <div class="feature-card">
+                       Post Your Text Context Right Now
+                 </div>
+               </a>
+               <a onclick="window.location.href='{{ url_for('x_platform.future_post_page') }}'" >
+                 <div class="feature-card">
+                     Schedule Your Text Context
+                 </div>
+                </a>
+                {% if role == 'pro_user' %}
+                   <a  onclick="window.location.href='{{ url_for('x_platform_pro_users.post_instant_media_files') }}'"  >
+                     <div class="feature-card">
+                         Post Your Media File Right Now
+                     </div>
+                   </a>
+
+                    <a  onclick="window.location.href='{{ url_for('x_platform_pro_users.post_futureCast_medias_f_pro_users') }}'" >
+                     <div class="feature-card">
+                         Schedule Your Media File
+                     </div>
+                    </a>
+                {% endif %}
+
          </div>
+      </div>
     </div>
 
 

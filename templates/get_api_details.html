@@ -4,33 +4,36 @@
     <div class="dashboard-container">
 
        <div class="sidebar">
-               <h2>Social Vista</h2>
-            <nav class="sidebar-nav">
-                <a href="{{ url_for('home.home') }}">🏠 Home</a>
-                <a href="{{ url_for('dashboard.dashboard') }}">🚪 Dashboard</a>
+                   <h2>Social Vista</h2>
+                <nav class="sidebar-nav">
 
-            <p>✨ Select Platform</p>
-            <select name="platform" id="platform" class="sidebar-select" onchange="if(this.value) window.location.href=this.value">
-                <option value="" selected>X</option>
-                <option value="{{ url_for('x_platform.choose_posting_method') }}">🐦 Post to X</option>
-                <option value="{{ url_for('api_details.show_api_credentials') }}">🔑 API Details</option>
-                <option value="{{ url_for('api_details.connect_twitter') }}">🔗 Connect X</option>
-            </select>
-             <select name="platform" id="platform" class="sidebar-select" onchange="if(this.value) window.location.href=this.value">
-                <option value="" selected>Facebook</option>
-                <option value="{{ url_for('x_platform.choose_posting_method') }}">🐦 Post to Facebook</option>
-                <option value="{{ url_for('api_details.show_api_credentials') }}">🔑 API Details</option>
-                <option value="{{ url_for('api_details.connect_twitter') }}">🔗 Connect Facebook</option>
-            </select>
-            <select name="platform" id="platform" class="sidebar-select" onchange="if(this.value) window.location.href=this.value">
-                <option value="" selected>Instagram</option>
-                <option value="{{ url_for('x_platform.choose_posting_method') }}">🐦 Post to Instagram</option>
-                <option value="{{ url_for('api_details.show_api_credentials') }}">🔑 API Details</option>
-                <option value="{{ url_for('api_details.connect_twitter') }}">🔗 Connect Instagram</option>
-            </select>
-                <a href="{{ url_for('auth.logout') }}" class="btn-logout">🚪 Logout</a>
-            </nav>
-      </div>
+                    <a href="{{ url_for('dashboard.dashboard') }}">🚪 Dashboard</a>
+                    <a href="{{ url_for('premium_interface.premium_interface') }}">💎 Premium</a>
+
+
+                <p>✨ Select Platform</p>
+                <select name="platform" id="platform" class="sidebar-select" onchange="if(this.value) window.location.href=this.value">
+                    <option value="" selected>X</option>
+                    <option value="{{ url_for('x_platform.choose_posting_method') }}">🐦 Post to X</option>
+                    <option value="{{ url_for('api_details.show_api_credentials') }}">🔑 API Details</option>
+                    <option value="{{ url_for('api_details.connect_twitter') }}">🔗 Connect X</option>
+                </select>
+                 <select name="platform" id="platform" class="sidebar-select" onchange="if(this.value) window.location.href=this.value">
+                    <option value="" selected>Facebook</option>
+                    <option value="{{ url_for('coming_soon.coming_soon') }}">🐦 Post to Facebook</option>
+                    <option value="{{ url_for('coming_soon.coming_soon') }}">🔑 API Details</option>
+                    <option value="{{ url_for('coming_soon.coming_soon') }}">🔗 Connect Facebook</option>
+                </select>
+                <select name="platform" id="platform" class="sidebar-select" onchange="if(this.value) window.location.href=this.value">
+                    <option value="" selected>Instagram</option>
+                    <option value="{{ url_for('coming_soon.coming_soon') }}">🐦 Post to Instagram</option>
+                    <option value="{{ url_for('coming_soon.coming_soon') }}">🔑 API Details</option>
+                    <option value="{{ url_for('coming_soon.coming_soon') }}">🔗 Connect Instagram</option>
+                </select>
+                     <a href="{{ url_for('auth.logout') }}" class="btn-logout">🚪 Logout</a><br><br>
+                    {% if role == 'pro_user' %}👑 Premium User{% endif %}
+                </nav>
+          </div>
 
 
 <!-- Connect Twitter Form -->

@@ -7,14 +7,18 @@
                    <br>
             <h2 class="form_head_topic">Login</h2>
                 <form action="{{url_for('auth.login')}}" method="POST" id="auth-form">
-                    <input type="email" placeholder="email" value="{{email}}" name="email" class="input-field">
-                    <input type="password" placeholder="password" name="password" class="input-field">
+                     <label for="email" style="margin-right: 900px">Email:</label>
+                    <input type="email" id="email" placeholder="email" value="{{email}}" name="email" class="input-field">
+                    <label for="password" style="margin-right: 900px">Password:</label>
+                    <input type="password" id="password" placeholder="password" name="password" class="input-field">
+
                     <input type="submit" value="Login" class="btn btn-login">
                     <input type="button" value="Register" class="btn btn-login" onclick="window.location.href='{{ url_for('auth.signup') }}'">
 
                 </form>
                     <h4>{{error}}</h4>
             </div>
+
 
 
 {% endblock %}
